@@ -57,6 +57,18 @@ function sparkline(counts, width, height) {
     '<span class="sub">' + lo + "–" + hi + "</span>";
 }
 
+/* GitHub reports an unrecognised licence file as NOASSERTION. That is not a
+   licence name -- it means nobody can tell what the terms are, which is the
+   thing a reader needs to know. */
+function isUnclearLicense(license) {
+  return !license || license === "NOASSERTION" || license === "unstated";
+}
+function licenseCell(license) {
+  return isUnclearLicense(license)
+    ? '<span class="lic-unclear">unclear</span>'
+    : '<span class="sub">' + esc(license) + "</span>";
+}
+
 function deltaTag(value, unit) {
   if (value == null || value === 0) return "";
   var cls = value > 0 ? "delta-up" : "delta-down";
@@ -171,7 +183,7 @@ function renderModels() {
         '<td><div class="tasks">' + mo.tasks.map(function (t) {
           return '<span class="task-dot">' + t + "</span>";
         }).join("") + "</div></td>" +
-        "<td><span class=\"sub\">" + esc(mo.license || "unstated") + "</span></td>" +
+        "<td>" + licenseCell(mo.license) + "</td>" +
         "</tr>";
     }).join("") + "</tbody></table></div>" +
     '<p class="sub">' + rows.length + " of " + DATA.models.length +
@@ -204,7 +216,8 @@ function renderDetail(id) {
   el("view-detail").innerHTML =
     '<button class="back" id="back-btn">← Back to leaderboard</button>' +
     '<div class="card"><h2>' + esc(mo.name) + "</h2>" +
-    '<p class="sub">' + esc(mo.org) + " · " + mo.year + " · license " + esc(mo.license || "unstated") + "</p>" +
+    '<p class="sub">' + esc(mo.org) + " · " + mo.year + " · licence " +
+    (isUnclearLicense(mo.license) ? "unclear" : esc(mo.license)) + "</p>" +
     (mo.notes ? "<p>" + esc(mo.notes) + "</p>" : "") +
     (links.length ? '<p class="sub">' + links.join(" · ") + "</p>" : "") +
     '<div class="spec-grid">' + specs.map(function (s) {
@@ -247,6 +260,215 @@ function articleRow(a) {
     esc(a.first_author || "—") + (a.n_authors > 1 ? " et al." : "") +
     " · " + esc(a.venue || "unlisted") + " · " + (a.date || a.year || "") + "</div></div>";
 }
+
+/* ---------- landscape: citations x usage ----------
+   The point of this view is that the two axes disagree. Median crosshairs split
+   the plane into four quadrants so "cited but nobody runs it" is a position on
+   screen rather than a claim in prose. */
+
+function shortName(name) { return name.replace(/ \(.*/, "").replace(/ \/ .*/, ""); }
+function hasUsageData(mo) { return !!(mo.github || mo.hf); }
+function usageValue(mo) { return (mo.stars || 0) + (mo.downloads || 0); }
+
+function median(values) {
+  var s = values.slice().sort(function (a, b) { return a - b; });
+  if (!s.length) return 0;
+  var mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+/* Greedy label placement: try four offsets, take the first that does not
+   collide with a label already placed. Anything that cannot be placed is left
+   to the hover card rather than allowed to overlap. */
+function placeLabels(items) {
+  var placed = [];
+  items.forEach(function (item) {
+    var w = item.text.length * 6.1, h = 12;
+    var candidates = [
+      [item.cx - w / 2, item.cy - item.r - 6 - h],
+      [item.cx - w / 2, item.cy + item.r + 4],
+      [item.cx + item.r + 5, item.cy - h / 2],
+      [item.cx - item.r - 5 - w, item.cy - h / 2]
+    ];
+    for (var i = 0; i < candidates.length; i++) {
+      var box = {x: candidates[i][0], y: candidates[i][1], w: w, h: h};
+      var hit = placed.some(function (p) {
+        return !(box.x + box.w < p.x || p.x + p.w < box.x ||
+                 box.y + box.h < p.y || p.y + p.h < box.y);
+      });
+      if (!hit) {
+        placed.push(box);
+        item.label = {x: box.x + w / 2, y: box.y + h - 2};
+        return;
+      }
+    }
+  });
+  return items;
+}
+
+function renderLandscape() {
+  var plotted = DATA.models.filter(hasUsageData);
+  var missing = DATA.models.filter(function (m) { return !hasUsageData(m); });
+
+  var W = 1040, H = 520, P = {t: 22, r: 28, b: 56, l: 72};
+  var lg = function (v) { return Math.log10((v || 0) + 1); };
+  var xmax = Math.ceil(Math.max.apply(null, plotted.map(function (m) { return lg(m.citations); })));
+  var ymax = Math.ceil(Math.max.apply(null, plotted.map(function (m) { return lg(usageValue(m)); })));
+  var X = function (v) { return P.l + (lg(v) / xmax) * (W - P.l - P.r); };
+  var Y = function (v) { return H - P.b - (lg(v) / ymax) * (H - P.t - P.b); };
+  var cmax = Math.max.apply(null, DATA.models.map(function (m) { return m.cells || 0; })) || 1;
+  var R = function (c) { return 5 + 11 * Math.sqrt((c || 0) / cmax); };
+
+  var mx = median(plotted.map(function (m) { return m.citations; }));
+  var my = median(plotted.map(function (m) { return usageValue(m); }));
+
+  var svg = '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" role="img" ' +
+    'aria-label="Citations versus usage for every tracked model">';
+
+  for (var e = 0; e <= xmax; e++) {
+    var gx = P.l + (e / xmax) * (W - P.l - P.r);
+    svg += '<line x1="' + gx + '" y1="' + P.t + '" x2="' + gx + '" y2="' + (H - P.b) +
+      '" stroke="var(--grid)" stroke-width="1"/>' +
+      '<text x="' + gx + '" y="' + (H - P.b + 18) + '" fill="var(--muted)" font-size="11" ' +
+      'text-anchor="middle">' + Math.pow(10, e).toLocaleString() + "</text>";
+  }
+  for (var f = 0; f <= ymax; f++) {
+    var gy = H - P.b - (f / ymax) * (H - P.t - P.b);
+    svg += '<line x1="' + P.l + '" y1="' + gy + '" x2="' + (W - P.r) + '" y2="' + gy +
+      '" stroke="var(--grid)" stroke-width="1"/>' +
+      '<text x="' + (P.l - 9) + '" y="' + (gy + 4) + '" fill="var(--muted)" font-size="11" ' +
+      'text-anchor="end">' + Math.pow(10, f).toLocaleString() + "</text>";
+  }
+
+  svg += '<line x1="' + X(mx) + '" y1="' + P.t + '" x2="' + X(mx) + '" y2="' + (H - P.b) +
+    '" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="4 4"/>' +
+    '<line x1="' + P.l + '" y1="' + Y(my) + '" x2="' + (W - P.r) + '" y2="' + Y(my) +
+    '" stroke="var(--baseline)" stroke-width="1" stroke-dasharray="4 4"/>' +
+    '<text class="quad-note" x="' + (W - P.r - 8) + '" y="' + (H - P.b - 9) +
+    '" text-anchor="end">cited, but little used →</text>' +
+    '<text class="quad-note" x="' + (P.l + 8) + '" y="' + (P.t + 14) + '">← used, but little cited</text>';
+
+  svg += '<text x="' + ((W + P.l) / 2) + '" y="' + (H - 12) +
+    '" fill="var(--ink-2)" font-size="12.5" text-anchor="middle">citations (log scale)</text>' +
+    '<text x="18" y="' + (H / 2) + '" fill="var(--ink-2)" font-size="12.5" text-anchor="middle" ' +
+    'transform="rotate(-90 18 ' + (H / 2) + ')">GitHub stars + HF downloads (log scale)</text>';
+
+  var items = placeLabels(plotted.map(function (m) {
+    return {id: m.id, text: shortName(m.name), cx: X(m.citations),
+            cy: Y(usageValue(m)), r: R(m.cells)};
+  }).sort(function (a, b) { return b.r - a.r; }));
+
+  // Two passes: every dot, then every label. Interleaving them lets a dot drawn
+  // later paint over an earlier label.
+  var labels = "";
+  items.forEach(function (item) {
+    var mo = DATA.models.filter(function (m) { return m.id === item.id; })[0];
+    svg += '<circle class="dot" data-dot="' + mo.id + '" cx="' + item.cx.toFixed(1) +
+      '" cy="' + item.cy.toFixed(1) + '" r="' + item.r.toFixed(1) +
+      '" fill="var(--' + statusVar(mo.upkeep) + ')" fill-opacity=".55" ' +
+      'stroke="var(--surface)" stroke-width="2"><title>' + esc(mo.name) + "</title></circle>";
+    if (item.label) {
+      labels += '<text class="dot-label" x="' + item.label.x.toFixed(1) + '" y="' +
+        item.label.y.toFixed(1) + '" fill="var(--ink)" font-size="11.5" ' +
+        'text-anchor="middle" stroke="var(--page)" stroke-width="3" ' +
+        'paint-order="stroke">' + esc(item.text) + "</text>";
+    }
+  });
+  svg += labels + "</svg>";
+
+  el("view-landscape").innerHTML =
+    '<div class="card"><h2>Attention is not usage</h2>' +
+    '<p class="sub">Each model plotted by how often it is cited against how often it is actually ' +
+    'pulled. Dashed lines are the medians. A model low and to the right is one the field writes ' +
+    'about but does not run; high and to the left is the opposite. Dot size is pretraining corpus ' +
+    'size; colour is upkeep. Click any model to open its page.</p>' +
+    '<div class="chart-legend">' +
+    '<span><i style="background:var(--good)"></i>active — commit within 90 days</span>' +
+    '<span><i style="background:var(--warning)"></i>slowing — within a year</span>' +
+    '<span><i style="background:var(--critical)"></i>dormant — over a year</span>' +
+    "</div>" + svg +
+    (missing.length ? '<p class="sub">' + missing.length + " model(s) not plotted — " +
+      missing.map(function (m) { return esc(shortName(m.name)); }).join(", ") +
+      " — because no GitHub repo or Hugging Face weights are registered for them. That is " +
+      "missing data, not zero usage.</p>" : "") +
+    "</div>";
+}
+
+function statusVar(upkeep) {
+  if (upkeep === "active") return "good";
+  if (upkeep === "slowing") return "warning";
+  if (upkeep === "dormant" || upkeep === "archived") return "critical";
+  return "muted";
+}
+
+/* ---------- capability matrix ---------- */
+function renderMatrix() {
+  var rows = DATA.models.slice().sort(function (a, b) { return b.score - a.score; });
+  var unclear = 0;
+
+  var body = rows.map(function (mo) {
+    var isUnclear = isUnclearLicense(mo.license);
+    if (isUnclear) unclear++;
+    return "<tr>" +
+      '<td><span class="model-name" data-model="' + mo.id + '">' + esc(shortName(mo.name)) +
+      '</span><div class="model-org">' + mo.year + "</div></td>" +
+      TASKS.map(function (t) {
+        var on = mo.tasks.indexOf(t) >= 0;
+        return '<td class="c"><span class="cell' + (on ? " on" : "") + '" title="' +
+          esc(mo.name + (on ? " supports " : " does not support ") + t) + '"></span></td>';
+      }).join("") +
+      '<td class="num">' + compact(mo.params) + "</td>" +
+      '<td class="num">' + compact(mo.cells) + "</td>" +
+      "<td>" + licenseCell(mo.license) + "</td>" +
+      '<td><span class="status-dot status-' + mo.upkeep + '">●</span> <span class="sub">' +
+      mo.upkeep + "</span></td>" +
+      '<td class="num">' + num(mo.citations) + "</td></tr>";
+  }).join("");
+
+  el("view-matrix").innerHTML =
+    '<div class="card"><h2>What each model can actually do</h2>' +
+    '<p class="sub">Every tracked model against every supported task, plus the two facts that ' +
+    'decide whether you can use it: what the licence permits, and whether anyone still maintains ' +
+    'it. Task support is as claimed by each model’s own paper, not independently verified.</p>' +
+    '<div class="table-scroll"><table class="matrix"><thead><tr><th>Model</th>' +
+    TASKS.map(function (t) { return '<th class="c">' + t + "</th>"; }).join("") +
+    '<th class="num">Params</th><th class="num">Cells</th><th>Licence</th>' +
+    "<th>Upkeep</th><th class=\"num\">Citations</th></tr></thead><tbody>" +
+    body + "</tbody></table></div>" +
+    '<p class="sub">' + unclear + " of " + rows.length +
+    " models ship without a clear licence — for those, weights being downloadable is not the " +
+    "same as permission to use them.</p></div>";
+}
+
+/* ---------- hover card ---------- */
+document.addEventListener("mouseover", function (e) {
+  var id = e.target.dataset && e.target.dataset.dot;
+  if (!id) return;
+  var mo = DATA.models.filter(function (m) { return m.id === id; })[0];
+  if (!mo) return;
+  var tip = el("tooltip");
+  tip.innerHTML = "<b>" + esc(mo.name) + "</b>" +
+    '<div class="sub">' + esc(mo.org) + " · " + mo.year + "</div>" +
+    '<div class="row"><span>citations</span><span>' + num(mo.citations) + "</span></div>" +
+    '<div class="row"><span>GitHub stars</span><span>' + (mo.github ? num(mo.stars) : "—") + "</span></div>" +
+    '<div class="row"><span>HF downloads</span><span>' + (mo.hf ? num(mo.downloads) : "—") + "</span></div>" +
+    '<div class="row"><span>pretraining cells</span><span>' + compact(mo.cells) + "</span></div>" +
+    '<div class="row"><span>upkeep</span><span class="status-' + mo.upkeep + '">' +
+    mo.upkeep + (mo.days_since_push != null ? " (" + mo.days_since_push + "d)" : "") + "</span></div>";
+  tip.hidden = false;
+});
+document.addEventListener("mousemove", function (e) {
+  var tip = el("tooltip");
+  if (tip.hidden) return;
+  var x = e.clientX + 14, y = e.clientY + 14;
+  if (x + tip.offsetWidth > window.innerWidth - 8) x = e.clientX - tip.offsetWidth - 14;
+  if (y + tip.offsetHeight > window.innerHeight - 8) y = e.clientY - tip.offsetHeight - 14;
+  tip.style.left = x + "px";
+  tip.style.top = y + "px";
+});
+document.addEventListener("mouseout", function (e) {
+  if (e.target.dataset && e.target.dataset.dot) el("tooltip").hidden = true;
+});
 
 /* ---------- citing-articles feed ---------- */
 function renderCitations() {
@@ -310,7 +532,7 @@ function renderAbout() {
 
 /* ---------- routing ---------- */
 function show(view, arg) {
-  ["models", "citations", "about", "detail"].forEach(function (v) {
+  ["models", "landscape", "matrix", "citations", "about", "detail"].forEach(function (v) {
     el("view-" + v).hidden = v !== view;
   });
   Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
@@ -319,6 +541,8 @@ function show(view, arg) {
     t.setAttribute("aria-selected", on ? "true" : "false");
   });
   if (view === "models") renderModels();
+  if (view === "landscape") renderLandscape();
+  if (view === "matrix") renderMatrix();
   if (view === "citations") renderCitations();
   if (view === "about") renderAbout();
   if (view === "detail") renderDetail(arg);
@@ -327,6 +551,12 @@ function show(view, arg) {
 document.addEventListener("click", function (e) {
   var t = e.target;
   if (t.dataset.model) { show("detail", t.dataset.model); window.scrollTo(0, 0); return; }
+  if (t.dataset.dot) {
+    el("tooltip").hidden = true;
+    show("detail", t.dataset.dot);
+    window.scrollTo(0, 0);
+    return;
+  }
   if (t.dataset.f) { filters[t.dataset.f] = !filters[t.dataset.f]; renderModels(); return; }
   if (t.dataset.use) { filters.use = t.dataset.use; renderCitations(); return; }
   if (t.dataset.sort) {

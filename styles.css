@@ -153,5 +153,37 @@ tbody tr:hover { background: var(--wash); }
 .use-extension { color: var(--series-3); }
 .use-review { color: var(--muted); }
 
+/* ---- landscape (citations x usage) ---- */
+:root { --good: #0ca30c; --warning: #fab219; --critical: #d03b3b; }
+.chart-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); margin-bottom: 10px; }
+.chart-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; margin-right: 5px; vertical-align: baseline; }
+.dot { cursor: pointer; }
+.dot:hover { fill-opacity: .9; }
+.dot-label { pointer-events: none; }
+.quad-note { fill: var(--muted); font-size: 11px; font-style: italic; }
+
+/* Hover card for scatter and matrix cells. */
+.tooltip {
+  position: fixed; z-index: 40; pointer-events: none; max-width: 260px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 9px 11px; font-size: 12.5px; line-height: 1.45;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .16);
+}
+.tooltip b { display: block; font-size: 13.5px; }
+.tooltip .row { display: flex; justify-content: space-between; gap: 14px; color: var(--ink-2); }
+
+/* ---- capability matrix ---- */
+.matrix td.c, .matrix th.c { text-align: center; }
+.matrix td, .matrix th { white-space: nowrap; }
+.matrix th { font-size: 10.5px; }
+.cell { display: inline-block; width: 19px; height: 19px; border-radius: 4px; background: var(--grid); opacity: .5; }
+.cell.on { background: var(--series-1); opacity: .85; }
+.lic-unclear { color: var(--warn-text); }
+.status-dot { font-size: 11px; }
+.status-active { color: var(--good); }
+.status-slowing { color: var(--warning); }
+.status-dormant, .status-archived { color: var(--critical); }
+.status-unknown { color: var(--muted); }
+
 .loading { color: var(--muted); padding: 30px 0; }
 .site-footer { color: var(--muted); font-size: 13px; padding: 24px 0 40px; border-top: 1px solid var(--border); margin-top: 30px; }

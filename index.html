@@ -27,11 +27,15 @@
 
   <nav class="tabs" role="tablist" aria-label="Views">
     <button class="tab active" role="tab" data-view="models" aria-selected="true">Model leaderboard</button>
+    <button class="tab" role="tab" data-view="landscape" aria-selected="false">Landscape</button>
+    <button class="tab" role="tab" data-view="matrix" aria-selected="false">Capability matrix</button>
     <button class="tab" role="tab" data-view="citations" aria-selected="false">Citing articles</button>
     <button class="tab" role="tab" data-view="about" aria-selected="false">About &amp; methods</button>
   </nav>
 
   <section id="view-models" class="view" role="tabpanel"></section>
+  <section id="view-landscape" class="view" role="tabpanel" hidden></section>
+  <section id="view-matrix" class="view" role="tabpanel" hidden></section>
   <section id="view-citations" class="view" role="tabpanel" hidden></section>
   <section id="view-about" class="view" role="tabpanel" hidden>
     <div id="about-dynamic"></div>
@@ -64,6 +68,7 @@
     Research aid only.</p>
 </footer>
 
+<div id="tooltip" class="tooltip" hidden></div>
 <script src="app.js"></script>
 </body>
 </html>
