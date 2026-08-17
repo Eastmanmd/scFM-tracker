@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Single-Cell Foundation Model Tracker — citations, usage &amp; upkeep</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap">
+    <h1>Single-Cell Foundation Model Tracker</h1>
+    <p class="tagline">Every single-cell RNA-seq foundation model, ranked by citations, real usage, and whether anyone still maintains it</p>
+    <p class="intro">Single-cell foundation models are transformers pretrained on tens of millions of
+      cells, then adapted to tasks like cell-type annotation, batch integration, and perturbation
+      prediction. New ones appear monthly and the claims are hard to compare. This tracker measures
+      three things that usually disagree: how much a model is <strong>cited</strong>, how much it is
+      actually <strong>downloaded and starred</strong>, and how recently anyone
+      <strong>touched the code</strong>. It also shows who is citing each model — and whether they
+      used it or benchmarked it and found it wanting.</p>
+    <p class="provenance" id="provenance"></p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="kpi-row" id="kpi-row" aria-label="Field summary"></section>
+
+  <nav class="tabs" role="tablist" aria-label="Views">
+    <button class="tab active" role="tab" data-view="models" aria-selected="true">Model leaderboard</button>
+    <button class="tab" role="tab" data-view="citations" aria-selected="false">Citing articles</button>
+    <button class="tab" role="tab" data-view="about" aria-selected="false">About &amp; methods</button>
+  </nav>
+
+  <section id="view-models" class="view" role="tabpanel"></section>
+  <section id="view-citations" class="view" role="tabpanel" hidden></section>
+  <section id="view-about" class="view" role="tabpanel" hidden>
+    <div id="about-dynamic"></div>
+    <div class="card">
+      <h2>About the compiler</h2>
+      <p><strong>Ali Eastman Oku</strong> is a Computational Biologist at the New York Genome
+        Center with dual Master's degrees in Computer Science and Biology, specializing in
+        computational pipelines and web tools that translate complex multi-omic data into
+        actionable insights.</p>
+      <p class="sub">
+        <a href="https://www.linkedin.com/in/ali-eastman-oku/" rel="noopener">LinkedIn</a>
+        · <a href="https://github.com/Eastmanmd" rel="noopener">GitHub</a>
+      </p>
+      <p class="sub">Citation counts are a measure of attention, not of quality. Several
+        independent benchmarks report that these models do not always beat far simpler
+        baselines — the “benchmark” label on citing articles is there to help you find those
+        papers rather than hide them.</p>
+    </div>
+  </section>
+  <section id="view-detail" class="view" hidden></section>
+
+  <div id="loading" class="loading">Loading data…</div>
+</main>
+
+<footer class="site-footer wrap">
+  <p>Data: <a href="https://openalex.org/" rel="noopener">OpenAlex</a> (citations and citing works) ·
+    <a href="https://github.com/" rel="noopener">GitHub</a> (repo activity) ·
+    <a href="https://huggingface.co/" rel="noopener">Hugging Face Hub</a> (weight downloads).
+    Citations are deduplicated across preprint and journal versions of each model paper.
+    Research aid only.</p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

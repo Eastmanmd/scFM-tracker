@@ -1,0 +1,99 @@
+{
+ "snapshots": [
+  {
+   "date": "2026-08-16",
+   "models": {
+    "geneformer": {
+     "citations": 1131,
+     "stars": 0,
+     "downloads": 4396
+    },
+    "scgpt": {
+     "citations": 1322,
+     "stars": 1612,
+     "downloads": 0
+    },
+    "state": {
+     "citations": 69,
+     "stars": 640,
+     "downloads": 188
+    },
+    "scfoundation": {
+     "citations": 607,
+     "stars": 422,
+     "downloads": 0
+    },
+    "uce": {
+     "citations": 172,
+     "stars": 326,
+     "downloads": 0
+    },
+    "nicheformer": {
+     "citations": 131,
+     "stars": 169,
+     "downloads": 0
+    },
+    "cellfm": {
+     "citations": 75,
+     "stars": 111,
+     "downloads": 0
+    },
+    "scbert": {
+     "citations": 629,
+     "stars": 359,
+     "downloads": 0
+    },
+    "aido-cell": {
+     "citations": 15,
+     "stars": 118,
+     "downloads": 252
+    },
+    "scprint": {
+     "citations": 45,
+     "stars": 156,
+     "downloads": 0
+    },
+    "cell2sentence": {
+     "citations": 61,
+     "stars": 872,
+     "downloads": 0
+    },
+    "genecompass": {
+     "citations": 146,
+     "stars": 120,
+     "downloads": 0
+    },
+    "transcriptformer": {
+     "citations": 29,
+     "stars": 158,
+     "downloads": 0
+    },
+    "cellplm": {
+     "citations": 72,
+     "stars": 104,
+     "downloads": 0
+    },
+    "scmulan": {
+     "citations": 32,
+     "stars": 62,
+     "downloads": 0
+    },
+    "tgpt": {
+     "citations": 70,
+     "stars": 0,
+     "downloads": 0
+    },
+    "scimilarity": {
+     "citations": 40,
+     "stars": 258,
+     "downloads": 0
+    },
+    "langcell": {
+     "citations": 5,
+     "stars": 70,
+     "downloads": 0
+    }
+   }
+  }
+ ]
+}

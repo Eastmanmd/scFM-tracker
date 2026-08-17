@@ -1,0 +1,20 @@
+{
+ "updated": "2026-08-16",
+ "models_tracked": 18,
+ "total_citations": 4651,
+ "open_weights": 18,
+ "actively_maintained": 6,
+ "weights": {
+  "attention": 0.35,
+  "momentum": 0.25,
+  "usage": 0.2,
+  "openness": 0.2
+ },
+ "momentum_basis": "share of citations from the last two years (no history yet)",
+ "history_depth": 1,
+ "sources": [
+  "OpenAlex",
+  "GitHub",
+  "Hugging Face Hub"
+ ]
+}

@@ -1,0 +1,45 @@
+name: Weekly scFM refresh
+
+on:
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch: {}    # allow manual runs from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore pipeline cache
+        uses: actions/cache@v4
+        with:
+          path: cache
+          key: pipeline-cache-${{ github.run_id }}
+          restore-keys: pipeline-cache-
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run pipeline
+        env:
+          # Raises the GitHub API limit from 60/hr to 5000/hr.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENALEX_MAILTO: ${{ vars.OPENALEX_MAILTO }}
+        run: python pipeline/run_all.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "Weekly refresh $(date -u +%F)"
+          git push

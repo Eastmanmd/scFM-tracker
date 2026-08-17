@@ -1,0 +1,496 @@
+{
+  "_comment": [
+    "Curated registry of single-cell RNA-seq foundation models. This is the one",
+    "file maintained by hand; everything else in data/ is generated.",
+    "",
+    "Per model:",
+    "  papers   - every version of the model paper (preprint AND journal). Citing",
+    "             works are unioned across versions and deduped by OpenAlex work id,",
+    "             so listing both does not double-count.",
+    "  openalex - filled in by resolve_ids.py; do not edit by hand.",
+    "  params   - parameter count, or null if the paper does not state one.",
+    "  cells    - number of cells in the pretraining corpus.",
+    "  tasks    - annotation | integration | imputation | perturbation | grn | spatial",
+    "  license  - SPDX id where known; 'non-commercial' flags restricted weights.",
+    "Leave a field null rather than guessing - nulls render as 'not reported'."
+  ],
+  "models": [
+    {
+      "id": "scgpt",
+      "name": "scGPT",
+      "org": "Wang Lab, University of Toronto",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "scGPT: toward building a foundation model for single-cell multi-omics using generative AI",
+          "venue": "Nature Methods"
+        },
+        {
+          "title": "scGPT: Towards Building a Foundation Model for Single-Cell Multi-omics Using Generative AI",
+          "venue": "bioRxiv"
+        }
+      ],
+      "github": "bowang-lab/scGPT",
+      "hf": [],
+      "params": 53000000,
+      "cells": 33000000,
+      "tasks": [
+        "annotation",
+        "integration",
+        "imputation",
+        "perturbation",
+        "grn"
+      ],
+      "license": "MIT",
+      "weights_open": true,
+      "notes": "Generative transformer over gene tokens; the most widely benchmarked scFM."
+    },
+    {
+      "id": "geneformer",
+      "name": "Geneformer",
+      "org": "Ellinor Lab, Broad Institute",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "Transfer learning enables predictions in network biology",
+          "venue": "Nature"
+        }
+      ],
+      "github": null,
+      "hf": [
+        "ctheodoris/Geneformer"
+      ],
+      "params": 10000000,
+      "cells": 30000000,
+      "tasks": [
+        "annotation",
+        "grn",
+        "perturbation"
+      ],
+      "license": "Apache-2.0",
+      "weights_open": true,
+      "notes": "Rank-value encoding of expression; distributed primarily through Hugging Face. Corpus later expanded to ~95M cells."
+    },
+    {
+      "id": "scbert",
+      "name": "scBERT",
+      "org": "Tencent AI Lab",
+      "year": 2022,
+      "papers": [
+        {
+          "title": "scBERT as a large-scale pretrained deep language model for cell type annotation of single-cell RNA-seq data",
+          "venue": "Nature Machine Intelligence"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv",
+          "openalex_id": "W4200603052"
+        }
+      ],
+      "github": "TencentAILabHealthcare/scBERT",
+      "hf": [],
+      "params": null,
+      "cells": 1000000,
+      "tasks": [
+        "annotation"
+      ],
+      "license": "MIT",
+      "weights_open": true,
+      "notes": "Earliest widely cited scRNA transformer; Performer backbone."
+    },
+    {
+      "id": "scfoundation",
+      "name": "scFoundation",
+      "org": "BioMap / Tsinghua University",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "Large-scale foundation model on single-cell transcriptomics",
+          "venue": "Nature Methods"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv",
+          "openalex_id": "W4378806473"
+        }
+      ],
+      "github": "biomap-research/scFoundation",
+      "hf": [],
+      "params": 100000000,
+      "cells": 50000000,
+      "tasks": [
+        "annotation",
+        "imputation",
+        "perturbation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Read-depth-aware pretraining; 100M parameters over ~20k genes."
+    },
+    {
+      "id": "uce",
+      "name": "UCE (Universal Cell Embeddings)",
+      "org": "Leskovec Lab, Stanford / CZ Biohub",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "Universal Cell Embeddings: A Foundation Model for Cell Biology",
+          "venue": "bioRxiv"
+        },
+        {
+          "title": null,
+          "venue": "journal version",
+          "openalex_id": "W7167668826"
+        }
+      ],
+      "github": "snap-stanford/UCE",
+      "hf": [],
+      "params": 650000000,
+      "cells": 36000000,
+      "tasks": [
+        "annotation",
+        "integration"
+      ],
+      "license": "MIT",
+      "weights_open": true,
+      "notes": "Zero-shot, protein-embedding gene representation; works across species without retraining."
+    },
+    {
+      "id": "cellplm",
+      "name": "CellPLM",
+      "org": "OmicsML / Michigan State University",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "CellPLM: Pre-training of Cell Language Model Beyond Single Cells",
+          "venue": "ICLR"
+        }
+      ],
+      "github": "OmicsML/CellPLM",
+      "hf": [],
+      "params": 80000000,
+      "cells": 11000000,
+      "tasks": [
+        "annotation",
+        "imputation",
+        "perturbation",
+        "spatial"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Treats cells as tokens and models inter-cell relationships; includes spatial data in pretraining."
+    },
+    {
+      "id": "scmulan",
+      "name": "scMulan",
+      "org": "Tsinghua University",
+      "year": 2024,
+      "papers": [
+        {
+          "title": "scMulan: a multitask generative pre-trained language model for single-cell analysis",
+          "venue": "RECOMB"
+        }
+      ],
+      "github": "SuperBianC/scMulan",
+      "hf": [],
+      "params": 368000000,
+      "cells": 10000000,
+      "tasks": [
+        "annotation",
+        "integration"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Cell-sentence formulation with metadata conditioning."
+    },
+    {
+      "id": "genecompass",
+      "name": "GeneCompass",
+      "org": "Chinese Academy of Sciences",
+      "year": 2024,
+      "papers": [
+        {
+          "title": "GeneCompass: deciphering universal gene regulatory mechanisms with a knowledge-informed cross-species foundation model",
+          "venue": "Cell Research"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv",
+          "openalex_id": "W4387122971"
+        }
+      ],
+      "github": "xCompass-AI/GeneCompass",
+      "hf": [],
+      "params": 100000000,
+      "cells": 120000000,
+      "tasks": [
+        "annotation",
+        "grn",
+        "perturbation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Cross-species (human + mouse) pretraining with injected prior knowledge."
+    },
+    {
+      "id": "nicheformer",
+      "name": "Nicheformer",
+      "org": "Theis Lab, Helmholtz Munich",
+      "year": 2024,
+      "papers": [
+        {
+          "title": "Nicheformer: a foundation model for single-cell and spatial omics",
+          "venue": "bioRxiv"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv",
+          "openalex_id": "W4394930851"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv (duplicate record)",
+          "openalex_id": "W4395056318"
+        }
+      ],
+      "github": "theislab/nicheformer",
+      "hf": [],
+      "params": null,
+      "cells": 110000000,
+      "tasks": [
+        "annotation",
+        "spatial"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Joint dissociated + spatial pretraining; included for spatial-task comparison."
+    },
+    {
+      "id": "langcell",
+      "name": "LangCell",
+      "org": "PharMolix / Tsinghua University",
+      "year": 2024,
+      "papers": [
+        {
+          "title": "LangCell: Language-Cell Pre-training for Cell Identity Understanding",
+          "venue": "ICML"
+        }
+      ],
+      "github": "PharMolix/LangCell",
+      "hf": [],
+      "params": null,
+      "cells": 27500000,
+      "tasks": [
+        "annotation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Contrastive cell-text pretraining; supports zero-shot cell type identification."
+    },
+    {
+      "id": "tgpt",
+      "name": "tGPT",
+      "org": "Sun Yat-sen University",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "Generative pretraining from large-scale transcriptomes for single-cell deciphering",
+          "venue": "iScience"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv",
+          "openalex_id": "W4212891644"
+        }
+      ],
+      "github": null,
+      "hf": [],
+      "params": null,
+      "cells": 22000000,
+      "tasks": [
+        "annotation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Autoregressive pretraining over gene rank sequences; bulk + single-cell corpus."
+    },
+    {
+      "id": "scimilarity",
+      "name": "SCimilarity",
+      "org": "Genentech",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "Scalable querying of human cell atlases via a foundational model reveals commonalities across fibrosis-associated macrophages",
+          "venue": "bioRxiv"
+        }
+      ],
+      "github": "Genentech/scimilarity",
+      "hf": [],
+      "params": null,
+      "cells": 23000000,
+      "tasks": [
+        "annotation",
+        "integration"
+      ],
+      "license": "Apache-2.0",
+      "weights_open": true,
+      "notes": "Metric-learning cell search rather than a masked-token transformer; included as a strong retrieval baseline."
+    },
+    {
+      "id": "cellfm",
+      "name": "CellFM",
+      "org": "Sun Yat-sen University / Biomed-AI",
+      "year": 2024,
+      "papers": [
+        {
+          "title": "CellFM: a large-scale foundation model pre-trained on transcriptomics of 100 million human cells",
+          "venue": "Nature Communications"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv",
+          "openalex_id": "W4399379291"
+        }
+      ],
+      "github": "biomed-AI/CellFM",
+      "hf": [],
+      "params": 800000000,
+      "cells": 100000000,
+      "tasks": [
+        "annotation",
+        "perturbation",
+        "grn"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Largest human-only scRNA model at release; strong showing in 2026 benchmark reviews."
+    },
+    {
+      "id": "cell2sentence",
+      "name": "Cell2Sentence / C2S-Scale",
+      "org": "van Dijk Lab, Yale",
+      "year": 2023,
+      "papers": [
+        {
+          "title": "Cell2Sentence: Teaching Large Language Models the Language of Biology",
+          "venue": "ICML"
+        }
+      ],
+      "github": "vandijklab/cell2sentence",
+      "hf": [],
+      "params": null,
+      "cells": null,
+      "tasks": [
+        "annotation",
+        "perturbation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Converts cells into gene-name sentences and fine-tunes a general LLM; C2S-Scale extends this to much larger backbones."
+    },
+    {
+      "id": "scprint",
+      "name": "scPRINT",
+      "org": "Cantini Lab, Institut Pasteur",
+      "year": 2024,
+      "papers": [
+        {
+          "title": "scPRINT: pre-training on 50 million cells allows robust gene network predictions",
+          "venue": "Nature Communications"
+        },
+        {
+          "title": null,
+          "venue": "bioRxiv",
+          "openalex_id": "W4401158823"
+        }
+      ],
+      "github": "cantinilab/scPRINT",
+      "hf": [],
+      "params": null,
+      "cells": 50000000,
+      "tasks": [
+        "annotation",
+        "integration",
+        "grn",
+        "imputation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Explicitly targets gene-network inference rather than embedding quality alone."
+    },
+    {
+      "id": "aido-cell",
+      "name": "AIDO.Cell",
+      "org": "GenBio AI",
+      "year": 2024,
+      "papers": [
+        {
+          "title": "Scaling Dense Representations for Single Cell with Transcriptome-Scale Context",
+          "venue": "bioRxiv"
+        }
+      ],
+      "github": "genbio-ai/ModelGenerator",
+      "hf": [
+        "genbio-ai/AIDO.Cell-100M"
+      ],
+      "params": 650000000,
+      "cells": 50000000,
+      "tasks": [
+        "annotation",
+        "perturbation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Reads the full transcriptome as context instead of a truncated gene set; 3M/10M/100M/650M sizes."
+    },
+    {
+      "id": "state",
+      "name": "STATE",
+      "org": "Arc Institute",
+      "year": 2025,
+      "papers": [
+        {
+          "title": "Predicting cellular responses to perturbation across diverse contexts with State",
+          "venue": "bioRxiv"
+        }
+      ],
+      "github": "ArcInstitute/state",
+      "hf": [
+        "arcinstitute/SE-600M"
+      ],
+      "params": 600000000,
+      "cells": 167000000,
+      "tasks": [
+        "perturbation",
+        "annotation"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Perturbation-first design; the current reference point for in-silico perturbation claims."
+    },
+    {
+      "id": "transcriptformer",
+      "name": "TranscriptFormer",
+      "org": "Chan Zuckerberg Initiative",
+      "year": 2025,
+      "papers": [
+        {
+          "title": "A cross-species generative cell atlas across 1.5 billion years of evolution: The TranscriptFormer single-cell model",
+          "venue": "bioRxiv"
+        }
+      ],
+      "github": "czi-ai/transcriptformer",
+      "hf": [],
+      "params": null,
+      "cells": 112000000,
+      "tasks": [
+        "annotation",
+        "integration"
+      ],
+      "license": null,
+      "weights_open": true,
+      "notes": "Generative cross-species model spanning 12 species."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# cache/ holds API responses only; it is rebuilt on demand and restored in CI
+# by actions/cache. data/ IS committed -- history.json cannot be backfilled.
+cache/
