@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-16",
+ "updated": "2026-08-17",
  "models_tracked": 18,
  "total_citations": 4651,
  "open_weights": 18,
@@ -11,7 +11,7 @@
   "openness": 0.2
  },
  "momentum_basis": "share of citations from the last two years (no history yet)",
- "history_depth": 1,
+ "history_depth": 2,
  "sources": [
   "OpenAlex",
   "GitHub",
