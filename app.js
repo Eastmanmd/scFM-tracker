@@ -76,6 +76,60 @@ function deltaTag(value, unit) {
     Math.abs(value) + (unit || "") + "</span>";
 }
 
+/* ---------- theme toggle ----------
+   With no stored choice the page follows the OS. The first click stores an
+   explicit preference, which then wins in both directions. Charts read their
+   colours from CSS custom properties, so nothing needs re-rendering. */
+
+var THEME_KEY = "scfm-theme";
+var SUN = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/>' +
+  '<path d="M12 2.6v2.2M12 19.2v2.2M4.2 12H2M22 12h-2.2M6.3 6.3 4.7 4.7M19.3 19.3l-1.6-1.6' +
+  'M17.7 6.3l1.6-1.6M4.7 19.3l1.6-1.6"/></svg>';
+var MOON = '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+  '<path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a8.6 8.6 0 1 0 11.1 11.1z"/></svg>';
+
+function storedTheme() {
+  try { return localStorage.getItem(THEME_KEY); } catch (e) { return null; }
+}
+function systemTheme() {
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches
+    ? "dark" : "light";
+}
+function activeTheme() {
+  return document.documentElement.getAttribute("data-theme") || systemTheme();
+}
+
+function paintToggle() {
+  var goingTo = activeTheme() === "dark" ? "light" : "dark";
+  el("theme-icon").innerHTML = goingTo === "dark" ? MOON : SUN;
+  el("theme-label").textContent = goingTo === "dark" ? "Dark" : "Light";
+  el("theme-toggle").setAttribute("aria-label", "Switch to " + goingTo + " mode");
+}
+
+function initTheme() {
+  paintToggle();
+  el("theme-toggle").addEventListener("click", function () {
+    var next = activeTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) { /* not fatal */ }
+    paintToggle();
+  });
+  // Keep the button honest if the OS flips while the user has no stored choice.
+  // Only the label can go stale -- the colours themselves are pure CSS -- so
+  // this is belt-and-braces: the media query event, plus a repaint whenever the
+  // tab is shown again, since that event does not fire everywhere.
+  var refresh = function () { if (!storedTheme()) paintToggle(); };
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    if (mq.addEventListener) mq.addEventListener("change", refresh);
+    else if (mq.addListener) mq.addListener(refresh);
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) refresh();
+  });
+  window.addEventListener("pageshow", refresh);
+}
+
 /* ---------- KPI row ---------- */
 function renderKpis() {
   var m = DATA.meta;
@@ -591,6 +645,9 @@ function readHash() {
     WEIGHT_KEYS.forEach(function (k, i) { weights[k] = parts[i]; });
   }
 }
+
+// Independent of the data load -- the toggle must work even if a fetch fails.
+initTheme();
 
 Promise.all(["models", "citations", "meta", "history"].map(function (f) {
   return fetch("data/" + f + ".json").then(function (r) { return r.json(); });

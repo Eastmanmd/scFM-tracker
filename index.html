@@ -5,10 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Single-Cell Foundation Model Tracker — citations, usage &amp; upkeep</title>
 <link rel="stylesheet" href="styles.css">
+<script>
+  // Applied before first paint so a stored dark choice never flashes light.
+  try {
+    var saved = localStorage.getItem("scfm-theme");
+    if (saved === "dark" || saved === "light") {
+      document.documentElement.setAttribute("data-theme", saved);
+    }
+  } catch (e) { /* private mode: fall back to the OS preference */ }
+</script>
 </head>
 <body>
 <header class="site-header">
   <div class="wrap">
+    <button class="theme-toggle" id="theme-toggle" type="button" aria-live="polite">
+      <span id="theme-icon" aria-hidden="true"></span>
+      <span id="theme-label">Theme</span>
+    </button>
     <h1>Single-Cell Foundation Model Tracker</h1>
     <p class="tagline">Every single-cell RNA-seq foundation model, ranked by citations, real usage, and whether anyone still maintains it</p>
     <p class="intro">Single-cell foundation models are transformers pretrained on tens of millions of
