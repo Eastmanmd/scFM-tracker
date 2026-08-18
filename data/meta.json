@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-17",
+ "updated": "2026-08-18",
  "models_tracked": 18,
  "total_citations": 4651,
  "open_weights": 18,
@@ -11,7 +11,21 @@
   "openness": 0.2
  },
  "momentum_basis": "share of citations from the last two years (no history yet)",
- "history_depth": 2,
+ "history_depth": 3,
+ "use_totals": {
+  "application": 3748,
+  "extension": 208,
+  "review": 336,
+  "benchmark": 359
+ },
+ "domain_totals": {
+  "method": 1451,
+  "unclear": 411,
+  "biology": 212,
+  "offtopic": 158
+ },
+ "biology_share": 0.127,
+ "unique_citing_works": 2232,
  "sources": [
   "OpenAlex",
   "GitHub",

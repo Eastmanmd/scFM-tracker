@@ -194,6 +194,7 @@ function renderModels() {
   var head = [
     ["rank", "#", ""], ["name", "Model", ""], ["score", "Score", "num"],
     ["citations", "Citations", "num"], ["", "Trend", ""],
+    ["biology_share", "Biology", "num"],
     ["downloads", "HF 30d", "num"], ["stars", "Stars", "num"],
     ["days_since_push", "Upkeep", ""], ["params", "Params", "num"],
     ["cells", "Cells", "num"], ["", "Tasks", ""], ["license", "License", ""]
@@ -227,6 +228,7 @@ function renderModels() {
         '<td class="num">' + num(mo.citations) + deltaTag(mo.citations_delta) + "</td>" +
         "<td>" + sparkline(mo.counts_by_year, 76, 22) +
         ' <span class="badge ' + mo.velocity + '">' + mo.velocity + "</span></td>" +
+        '<td class="num">' + bioShareCell(mo) + "</td>" +
         '<td class="num">' + (mo.hf ? num(mo.downloads) : "—") + "</td>" +
         '<td class="num">' + (mo.github ? num(mo.stars) : "—") + deltaTag(mo.stars_delta) + "</td>" +
         '<td><span class="badge ' + mo.upkeep + '">' + mo.upkeep + "</span>" +
@@ -242,6 +244,23 @@ function renderModels() {
     }).join("") + "</tbody></table></div>" +
     '<p class="sub">' + rows.length + " of " + DATA.models.length +
     " models shown. Click a model name for its detail page.</p></div>";
+}
+
+/* Share of a model's classified citations that are biology work, rendered as a
+   bar. Deliberately not coloured as good or bad: a low number can mean the
+   model is a methods plaything, or simply that biologists cite the tool paper
+   less than tool-builders do. The page states the ambiguity rather than
+   resolving it with a colour. */
+function bioShareCell(mo) {
+  if (mo.biology_share == null) return "—";
+  var pct = Math.round(mo.biology_share * 100);
+  var dc = mo.domain_counts || {};
+  // Scaled against a 30% ceiling: nothing in this corpus comes close to half,
+  // so a 0-100 track would render every model as a flat empty bar.
+  var fill = Math.min(100, (pct / 30) * 100);
+  return '<span class="bioshare" title="' + (dc.biology || 0) + " biology / " +
+    ((dc.biology || 0) + (dc.method || 0)) + ' classified as method or biology">' +
+    '<i style="width:' + fill.toFixed(0) + '%"></i><b>' + pct + "%</b></span>";
 }
 
 /* ---------- model detail ---------- */
@@ -297,7 +316,8 @@ function renderDetail(id) {
     '<p class="sub">Deduped total is ' + num(mo.citations) + ", versus " +
     num(mo.citations_naive_sum) + " if versions were simply summed — the gap is papers citing more than one version.</p></div>" +
 
-    '<div class="card"><h2>How the ' + num(mo.citations) + " citing papers use it</h2>" +
+    '<div class="card"><h2>Who is citing it</h2>' + domainPanel(mo) +
+    '<h2 style="margin-top:22px">How the ' + num(mo.citations) + " citing papers use it</h2>" +
     '<p class="sub">' + ["application", "benchmark", "extension", "review"].map(function (u) {
       return '<span class="use-' + u + '">' + u + ": " + (uses[u] || 0) + "</span>";
     }).join(" · ") + "</p>" +
@@ -307,10 +327,45 @@ function renderDetail(id) {
   el("back-btn").onclick = function () { show("models"); };
 }
 
+/* The method/biology split, with the abstentions kept visible. Hiding
+   "unclear" inside the denominator would make the biology share look more
+   precise than the classifier earns. */
+function domainPanel(mo) {
+  var dc = mo.domain_counts || {};
+  var order = ["method", "biology", "unclear", "offtopic"];
+  var total = order.reduce(function (n, k) { return n + (dc[k] || 0); }, 0);
+  if (!total) return '<p class="sub">Not yet classified.</p>';
+
+  var bar = '<div class="dombar">' + order.map(function (k) {
+    var v = dc[k] || 0;
+    if (!v) return "";
+    return '<i class="dom-' + k + '" style="width:' + (100 * v / total) +
+      '%" title="' + k + ": " + v + '"></i>';
+  }).join("") + "</div>";
+
+  var legend = '<p class="sub">' + order.map(function (k) {
+    return '<span class="dom-key dom-' + k + '"></span>' + k + ": " + (dc[k] || 0);
+  }).join(" · ") + "</p>";
+
+  var share = mo.biology_share == null ? "" :
+    "<p><strong>" + Math.round(mo.biology_share * 100) + "%</strong> of the " +
+    ((dc.biology || 0) + (dc.method || 0)) + " citations the classifier could call " +
+    "are biology papers; the rest are computational work. " +
+    (dc.unclear ? dc.unclear + " were too ambiguous to call and sit outside that ratio. " : "") +
+    "</p>";
+
+  return bar + legend + share +
+    '<p class="sub">Labels come from each citing paper\'s title and abstract, not its full ' +
+    "text — so this counts what kind of work cites the model, which is not the same as what " +
+    "kind of work <em>runs</em> it. A biology paper citing the model once in its introduction " +
+    "still counts here.</p>";
+}
+
 function articleRow(a) {
   return '<div class="art"><div class="t">' +
     (a.doi ? '<a href="' + esc(a.doi) + '" rel="noopener">' + esc(a.title) + "</a>" : esc(a.title)) +
     '</div><div class="m"><span class="use-' + a.use + '">' + a.use + "</span> · " +
+    '<span class="dom-tag dom-' + a.domain + '">' + a.domain + "</span> · " +
     esc(a.first_author || "—") + (a.n_authors > 1 ? " et al." : "") +
     " · " + esc(a.venue || "unlisted") + " · " + (a.date || a.year || "") + "</div></div>";
 }
@@ -539,21 +594,32 @@ function renderCitations() {
   all.sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
 
   var useFilter = filters.use || "all";
-  var shown = all.filter(function (a) { return useFilter === "all" || a.use === useFilter; });
+  var domFilter = filters.domain || "all";
+  var shown = all.filter(function (a) {
+    return (useFilter === "all" || a.use === useFilter) &&
+           (domFilter === "all" || a.domain === domFilter);
+  });
 
   el("view-citations").innerHTML =
     '<div class="card"><h2>What is citing these models</h2>' +
-    '<p class="sub">Every citing paper is labelled by how it uses the model, from its title. ' +
-    '<strong>Benchmark</strong> papers are the ones that evaluated a model rather than applied it — ' +
-    'that is where critical findings live.</p>' +
+    '<p class="sub">Every citing paper carries two labels. <em>Use</em> is what the paper does ' +
+    'with the model — <strong>benchmark</strong> papers evaluated it rather than applied it, which ' +
+    'is where critical findings live. <em>Field</em> is what kind of work the paper is: ' +
+    '<strong>method</strong> for new computational tools, <strong>biology</strong> for papers ' +
+    'making a claim about cells, tissue, or disease.</p>' +
     '<div class="filters">' + ["all", "application", "benchmark", "extension", "review"].map(function (u) {
       return '<button class="chip' + (useFilter === u ? " on" : "") + '" data-use="' + u + '">' + u + "</button>";
+    }).join("") + "</div>" +
+    '<div class="filters">' + ["all", "method", "biology", "unclear", "offtopic"].map(function (d) {
+      return '<button class="chip' + (domFilter === d ? " on" : "") + '" data-domain="' + d +
+        '">' + (d === "all" ? "all fields" : d) + "</button>";
     }).join("") + "</div></div>" +
     '<div class="card">' + shown.slice(0, 300).map(function (a) {
       return '<div class="art"><div class="t">' +
         (a.doi ? '<a href="' + esc(a.doi) + '" rel="noopener">' + esc(a.title) + "</a>" : esc(a.title)) +
         '</div><div class="m">cites <strong>' + esc(a.model) + '</strong> · <span class="use-' +
-        a.use + '">' + a.use + "</span> · " + esc(a.venue || "unlisted") +
+        a.use + '">' + a.use + "</span> · " + '<span class="dom-tag dom-' + a.domain +
+        '">' + a.domain + "</span> · " + esc(a.venue || "unlisted") +
         " · " + (a.date || a.year || "") + "</div></div>";
     }).join("") +
     '<p class="sub">Showing ' + Math.min(300, shown.length) + " of " + shown.length +
@@ -579,6 +645,23 @@ function renderAbout() {
     "since the last commit.</li></ul>" +
     "<p class='sub'>Deduplication matters: a review citing both the bioRxiv and the journal version " +
     "of a model paper counts once. Summing versions instead would inflate the best-known models most.</p></div>" +
+    '<div class="card"><h2>What kind of work cites these models</h2>' +
+    (m.biology_share == null ? "" :
+      "<p>Across " + num(m.unique_citing_works) + " unique citing papers, <strong>" +
+      Math.round(m.biology_share * 100) + "%</strong> of those the classifier could call are " +
+      "biology work; the rest are computational. That ratio, not the raw citation count, is " +
+      "the honest read on whether these models have reached the bench.</p>") +
+    "<p class='sub'>Every citing paper is labelled from its title, abstract, and OpenAlex " +
+    "topics by a rules-based classifier (<code>pipeline/classify.py</code>). It abstains when " +
+    "the evidence is thin rather than guessing, and those abstentions are excluded from the " +
+    "ratio above instead of being counted as non-biology.</p>" +
+    "<p class='sub'>Measured against " + "92 hand-labelled papers (<code>pipeline/labels.json</code>): " +
+    "89% accurate overall, 95% accurate on the papers it chose to call, abstaining on 7%. " +
+    "It is weakest on papers that are genuinely both — a new method whose point is a " +
+    "biological finding.</p>" +
+    "<p class='sub'>The larger caveat: this classifies the citing <em>paper</em>, not the " +
+    "citation. Separating a paper that ran the model from one that name-checked it in the " +
+    "introduction needs full text, which OpenAlex does not carry.</p></div>" +
     '<div class="card"><h2>Data sources</h2><p class="sub">' +
     (m.sources || []).join(" · ") + ". Updated " + m.updated + ", from " + m.history_depth +
     " weekly snapshot(s).</p></div>";
@@ -613,6 +696,7 @@ document.addEventListener("click", function (e) {
   }
   if (t.dataset.f) { filters[t.dataset.f] = !filters[t.dataset.f]; renderModels(); return; }
   if (t.dataset.use) { filters.use = t.dataset.use; renderCitations(); return; }
+  if (t.dataset.domain) { filters.domain = t.dataset.domain; renderCitations(); return; }
   if (t.dataset.sort) {
     if (sortKey === t.dataset.sort) sortDir = -sortDir;
     else { sortKey = t.dataset.sort; sortDir = -1; }

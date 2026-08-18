@@ -52,11 +52,57 @@ Two related data-quality rules:
 
 ## How citing articles are classified
 
-Every citing paper is labelled from its title as **application** (used the
-model), **benchmark** (evaluated or compared it), **extension** (built on it),
-or **review**. The benchmark label is the useful one: several independent
+Every citing paper carries two independent labels, assigned by
+`pipeline/classify.py` from its title, abstract, and OpenAlex topics.
+
+**Use** — what the paper does with the model: **application** (used it),
+**benchmark** (evaluated or compared it), **extension** (built on it), or
+**review**. The benchmark label is the useful one: several independent
 evaluations report that these models do not always beat much simpler baselines,
 and those papers are otherwise buried among hundreds of routine applications.
+
+**Field** — what kind of work the paper is: **method** (a new computational
+tool or model), **biology** (a claim about cells, tissue, or disease),
+**offtopic** (cites the model in passing, from outside the field), or
+**unclear**. This axis exists because the first one could not answer the
+question everyone actually asks. 79% of citing papers were landing in
+`application`, mixing new ML tools in with genuine biology — the two things
+worth telling apart.
+
+The derived number is **biology share**: the fraction of a model's classified
+citations that are biology work. Corpus-wide it is about 13%, and it is shown
+per model on the leaderboard. `unclear` papers are excluded from that ratio
+rather than counted against biology — an abstention is an unknown, not a no.
+
+Two limits are worth stating plainly:
+
+- **This classifies the citing paper, not the citation.** A biology paper that
+  name-checks a model once in its introduction still counts as a biology
+  citation. Separating use from mention needs full text, which OpenAlex does
+  not carry.
+- **The classifier is rules-based and imperfect.** Measured against
+  `pipeline/labels.json` (92 hand-labelled papers): 89% accurate overall, 95%
+  on the papers it chose to call, abstaining on 7%. It is weakest on papers
+  that are genuinely both — a new method whose whole point is a biological
+  finding.
+
+Abstracts cover 83–93% of citing works and ride along in the same paged
+OpenAlex request, so the second axis costs no extra API calls.
+
+### Changing the classifier
+
+`pipeline/labels.json` is the ground truth. Cached citing records keep their
+abstract and topics, so re-labelling never re-pages OpenAlex:
+
+```
+python3 pipeline/validate_classifier.py --errors
+```
+
+Edit `pipeline/classify.py`, rerun that, and compare. Read per-class recall and
+coverage, not just accuracy — biology is the minority class, and a classifier
+that answered "method" for everything would still score 76%. When you disagree
+with a label the site shows, add that work id to `labels.json` first, then
+tune.
 
 ## The registry
 
@@ -76,6 +122,9 @@ pipeline/
   registry.json      curated model registry (hand-edited)
   config.py          endpoints, weights, thresholds
   resolve_ids.py     verify every DOI / repo / weights id
+  classify.py        two-axis labelling of citing papers
+  labels.json        hand-labelled ground truth for the classifier
+  validate_classifier.py  score classify.py against labels.json
   fetch_openalex.py  citations, yearly trend, citing articles
   fetch_github.py    stars, forks, last commit
   fetch_hf.py        weight downloads
@@ -83,7 +132,7 @@ pipeline/
   run_all.py         orchestrates the above
 data/
   models.json        one row per model
-  citations.json     recent citing articles per model
+  citations.json     recent citing articles per model, labelled on both axes
   history.json       append-only weekly snapshots (drives deltas)
   meta.json          provenance
 ```

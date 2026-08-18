@@ -194,6 +194,55 @@ tbody tr:hover { background: var(--wash); }
 .use-extension { color: var(--series-3); }
 .use-review { color: var(--muted); }
 
+/* Field axis. Method and biology are the two that carry meaning; unclear and
+   offtopic are deliberately muted so the eye reads the split, not the noise. */
+.dom-method  { color: var(--series-2); }
+.dom-biology { color: var(--series-4, var(--series-3)); }
+.dom-unclear { color: var(--muted); }
+.dom-offtopic { color: var(--muted); }
+
+.dom-tag { font-weight: 600; }
+
+.dombar {
+  display: flex;
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--grid);
+  margin: 4px 0 10px;
+}
+.dombar i { display: block; height: 12px; }
+.dombar i.dom-method  { background: var(--series-2); }
+.dombar i.dom-biology { background: var(--series-4, var(--series-3)); }
+.dombar i.dom-unclear { background: var(--grid); box-shadow: inset 0 0 0 1px var(--muted); }
+.dombar i.dom-offtopic { background: transparent; box-shadow: inset 0 0 0 1px var(--grid); }
+
+.dom-key {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 2px;
+  margin-right: 5px;
+  vertical-align: baseline;
+}
+.dom-key.dom-method  { background: var(--series-2); }
+.dom-key.dom-biology { background: var(--series-4, var(--series-3)); }
+.dom-key.dom-unclear { background: var(--grid); box-shadow: inset 0 0 0 1px var(--muted); }
+.dom-key.dom-offtopic { background: transparent; box-shadow: inset 0 0 0 1px var(--grid); }
+
+/* Leaderboard cell: fill behind the number, same idiom as .scorebar. Shares
+   are small (single digits to teens), so the fill is scaled against a 30%
+   ceiling -- against a 100% track every model would read as an empty bar. */
+.bioshare { position: relative; display: inline-block; min-width: 52px; }
+.bioshare i {
+  position: absolute; inset: 0 auto 0 0; display: block;
+  background: var(--series-4); opacity: .3; border-radius: 3px;
+}
+.bioshare b {
+  position: relative; padding-left: 4px;
+  font-variant-numeric: tabular-nums; font-weight: 600;
+}
+
 /* ---- landscape (citations x usage) ---- */
 :root { --good: #0ca30c; --warning: #fab219; --critical: #d03b3b; }
 .chart-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 12.5px; color: var(--ink-2); margin-bottom: 10px; }

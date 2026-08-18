@@ -2,7 +2,7 @@
 
 Writes:
   data/models.json     one row per model: specs, metrics, score breakdown
-  data/citations.json  recent citing articles per model, labelled by use type
+  data/citations.json  recent citing articles per model, labelled on both axes
   data/history.json    append-only weekly snapshot (drives deltas + momentum)
   data/meta.json       provenance and corpus-level summary
 """
@@ -34,6 +34,23 @@ def normalize(values):
     if hi - lo < 1e-9:
         return dict((k, 0.0) for k in values)
     return dict((k, (v - lo) / (hi - lo)) for k, v in values.items())
+
+
+def biology_share(domain_counts):
+    """Share of *classified* citations that are biology work.
+
+    "unclear" is excluded from the denominator rather than counted against
+    biology. Papers the classifier abstained on are unknown, not non-biology,
+    and burying them in the denominator would understate the number by however
+    much the classifier happens to be hedging that week. The count of
+    abstentions travels alongside so the reader can see what was set aside.
+    """
+    method = domain_counts.get("method", 0)
+    bio = domain_counts.get("biology", 0)
+    decided = method + bio
+    if not decided:
+        return None
+    return round(bio / float(decided), 3)
 
 
 def license_score(spdx, weights_open):
@@ -159,6 +176,9 @@ def main():
             "citations_naive_sum": oa.get("citations_naive_sum", 0),
             "counts_by_year": counts_by_year,
             "use_counts": oa.get("use_counts", {}),
+            "domain_counts": oa.get("domain_counts", {}),
+            "biology_share": biology_share(oa.get("domain_counts", {})),
+            "abstract_coverage": oa.get("abstract_coverage", 0.0),
             "velocity": vel_label,
             "velocity_ratio": vel_ratio,
             "github": gh,
@@ -175,7 +195,14 @@ def main():
                                        if "citations" in base_row else None),
             "_upkeep_raw": upkeep,
         })
-        citations_out[mid] = oa.get("citing", [])
+        # Drop the classifier's raw inputs before they reach the browser --
+        # abstracts alone would multiply data/citations.json several times over
+        # for text nothing on the page renders.
+        citations_out[mid] = [
+            dict((k, v) for k, v in rec.items()
+                 if k not in ("abstract", "topic_names", "has_abstract"))
+            for rec in oa.get("citing", [])
+        ]
 
     # ---- score components ---------------------------------------------------
     attention = normalize(dict((r["id"], math.log1p(r["citations"])) for r in rows))
@@ -228,7 +255,9 @@ def main():
         "date": today_iso,
         "models": dict((r["id"], {"citations": r["citations"],
                                   "stars": r["stars"],
-                                  "downloads": r["downloads"]}) for r in rows),
+                                  "downloads": r["downloads"],
+                                  "biology_share": r["biology_share"]})
+                       for r in rows),
     }
     snapshots = [s for s in snapshots if s["date"] != today_iso] + [snapshot]
     snapshots.sort(key=lambda s: s["date"])
@@ -245,9 +274,13 @@ def main():
 
     total_citations = sum(r["citations"] for r in rows)
     use_totals = {}
-    for mid, records in citations_out.items():
-        for rec in records:
-            use_totals[rec["use"]] = use_totals.get(rec["use"], 0) + 1
+    for row in rows:
+        for key, count in row["use_counts"].items():
+            use_totals[key] = use_totals.get(key, 0) + count
+    # Per-model tallies double-count any paper citing more than one model, so
+    # the corpus figure comes from the deduped count the fetcher writes.
+    corpus = openalex.get("_corpus", {})
+    domain_totals = corpus.get("domain_counts", {})
 
     meta = {
         "updated": today_iso,
@@ -258,6 +291,10 @@ def main():
         "weights": weights,
         "momentum_basis": momentum_basis,
         "history_depth": len(snapshots),
+        "use_totals": use_totals,
+        "domain_totals": domain_totals,
+        "biology_share": biology_share(domain_totals),
+        "unique_citing_works": corpus.get("unique_citing_works", 0),
         "sources": ["OpenAlex", "GitHub", "Hugging Face Hub"],
     }
     with open(os.path.join(config.DATA_DIR, "meta.json"), "w") as fh:

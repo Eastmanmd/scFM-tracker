@@ -5,6 +5,11 @@ union of the works citing *any* version, deduped by OpenAlex work id -- a
 review that cites both the bioRxiv and the Nature Methods scGPT paper counts
 once, not twice. Summing per-version cited_by_count instead would inflate the
 best-known models the most, which is exactly the ranking we care about.
+
+Each citing work is labelled on two axes by pipeline/classify.py: what it does
+with the model (use) and what kind of work it is (domain). Abstracts and topics
+feed the second axis and cost nothing extra -- they ride along in the same
+paged request.
 """
 import json
 import os
@@ -14,31 +19,21 @@ import time
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import classify
 import config
 
 SELECT = ",".join([
     "id", "doi", "title", "publication_year", "publication_date",
     "type", "cited_by_count", "primary_location", "authorships",
+    # Free with the same page of results, and the only inputs that make the
+    # method/biology split better than a coin flip on short titles.
+    "abstract_inverted_index", "primary_topic", "topics",
 ])
 
-# Title keywords that say *how* the citing paper used the model.
-BENCHMARK_TERMS = ("benchmark", "evaluat", "comparison", "comparative",
-                   "assessing", "assessment", "limits of", "do ", "critical")
-REVIEW_TERMS = ("review", "survey", "perspective", "opportunities", "landscape")
-EXTENSION_TERMS = ("fine-tun", "finetun", "building on", "extend", "adapt",
-                   "improv", "distill")
-
-
-def classify(work):
-    """Label a citing work as benchmark / review / extension / application."""
-    title = (work.get("title") or "").lower()
-    if work.get("type") == "review" or any(t in title for t in REVIEW_TERMS):
-        return "review"
-    if any(t in title for t in BENCHMARK_TERMS):
-        return "benchmark"
-    if any(t in title for t in EXTENSION_TERMS):
-        return "extension"
-    return "application"
+# Bumped whenever slim() changes shape, so cached citing lists built by an
+# older pipeline are re-paged instead of silently serving records that lack
+# the newer fields.
+CACHE_SCHEMA = 3
 
 
 def get(url, params, attempts=6):
@@ -95,11 +90,19 @@ def fetch_citing(work_id):
 
 
 def slim(work):
-    """Keep only what the site renders."""
+    """Keep what the site renders, plus what re-labelling needs.
+
+    The abstract and topic stay on the cached record so the classifier can be
+    changed and re-run against the existing corpus without re-paging OpenAlex.
+    build_data.py strips both before writing data/citations.json -- the site
+    never needs them, and they would multiply the payload the browser fetches.
+    """
     loc = work.get("primary_location") or {}
     source = (loc.get("source") or {}).get("display_name")
     authors = work.get("authorships") or []
     first = authors[0]["author"]["display_name"] if authors else None
+    use, domain, confidence, has_abstract = classify.classify(work)
+    primary = work.get("primary_topic") or {}
     return {
         "id": work["id"].rsplit("/", 1)[-1],
         "doi": work.get("doi"),
@@ -110,7 +113,13 @@ def slim(work):
         "first_author": first,
         "n_authors": len(authors),
         "cited_by_count": work.get("cited_by_count"),
-        "use": classify(work),
+        "use": use,
+        "domain": domain,
+        "domain_confidence": confidence,
+        "has_abstract": has_abstract,
+        "abstract": classify.abstract_text(work.get("abstract_inverted_index")),
+        "topic": primary.get("display_name"),
+        "topic_names": classify.topic_names(work),
     }
 
 
@@ -129,6 +138,7 @@ def main():
             citing_cache = json.load(fh)
 
     out = {}
+    corpus = {}          # work id -> domain, deduped across every model
     refetched = 0
     for model in registry["models"]:
         mid = model["id"]
@@ -156,14 +166,18 @@ def main():
             wid = paper["openalex_id"]
             count = work.get("cited_by_count") or 0
             cached = citing_cache.get(wid)
-            if cached and cached.get("cited_by_count") == count:
+            if (cached and cached.get("cited_by_count") == count
+                    and cached.get("schema") == CACHE_SCHEMA):
                 records = cached["records"]
             else:
                 records = [slim(w) for w in fetch_citing(wid)]
-                citing_cache[wid] = {"cited_by_count": count, "records": records}
+                citing_cache[wid] = {"cited_by_count": count,
+                                     "schema": CACHE_SCHEMA,
+                                     "records": records}
                 refetched += 1
             for rec in records:
                 citing[rec["id"]] = rec
+                corpus[rec["id"]] = rec["domain"]
 
         # Rebuild the year histogram from the deduped citing set so the
         # sparkline and the headline number always agree.
@@ -189,8 +203,13 @@ def main():
                          key=lambda r: (r.get("date") or "", r.get("title") or ""),
                          reverse=True)
         use_counts = {}
+        domain_counts = {}
+        with_abstract = 0
         for rec in records:
             use_counts[rec["use"]] = use_counts.get(rec["use"], 0) + 1
+            domain_counts[rec["domain"]] = domain_counts.get(rec["domain"], 0) + 1
+            if rec.get("has_abstract"):
+                with_abstract += 1
 
         out[mid] = {
             "versions": versions,
@@ -199,11 +218,26 @@ def main():
             "counts_by_year": {str(k): v for k, v in sorted(counts_by_year.items())},
             "misdated_citations": misdated,
             "use_counts": use_counts,
+            "domain_counts": domain_counts,
+            "abstract_coverage": (round(with_abstract / float(len(records)), 3)
+                                  if records else 0.0),
             "citing": records[:config.CITING_PER_MODEL],
         }
-        print("{:<18} {:>5} citations ({} versions, naive sum {})  {}".format(
+        print("{:<18} {:>5} citations ({} versions, naive sum {})".format(
             mid, out[mid]["citations_total"], len(versions),
-            out[mid]["citations_naive_sum"], use_counts))
+            out[mid]["citations_naive_sum"]))
+        print("{:<18} {}  abstracts {:.0%}".format(
+            "", domain_counts, out[mid]["abstract_coverage"]))
+
+    # Corpus totals are counted over unique work ids, not summed across models.
+    # A review citing six of these models is one paper, and summing per-model
+    # tallies would let the most-cited models drag the headline share around.
+    corpus_counts = {}
+    for domain in corpus.values():
+        corpus_counts[domain] = corpus_counts.get(domain, 0) + 1
+    out["_corpus"] = {"domain_counts": corpus_counts,
+                      "unique_citing_works": len(corpus)}
+    print("\ncorpus: {} unique citing works  {}".format(len(corpus), corpus_counts))
 
     if not os.path.isdir(config.CACHE_DIR):
         os.makedirs(config.CACHE_DIR)
