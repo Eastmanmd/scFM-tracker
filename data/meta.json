@@ -1,9 +1,9 @@
 {
  "updated": "2026-08-21",
- "models_tracked": 18,
+ "models_tracked": 19,
  "total_citations": 4665,
- "open_weights": 18,
- "actively_maintained": 6,
+ "open_weights": 19,
+ "actively_maintained": 7,
  "weights": {
   "attention": 0.35,
   "momentum": 0.25,

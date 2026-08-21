@@ -491,6 +491,33 @@
       "license": null,
       "weights_open": true,
       "notes": "Generative cross-species model spanning 12 species."
+    },
+    {
+      "id": "cellhermes",
+      "name": "CellHermes",
+      "org": "Tongji University / Helmholtz Munich",
+      "year": 2025,
+      "papers": [
+        {
+          "title": "Language may be all omics needs: Harmonizing multimodal data for omics understanding with CellHermes",
+          "venue": "bioRxiv"
+        }
+      ],
+      "github": "theislab/CellHermes",
+      "hf": [
+        "EthanGao123/CellHermes-v1.0"
+      ],
+      "params": 8030261248,
+      "cells": null,
+      "tasks": [
+        "annotation",
+        "integration",
+        "perturbation",
+        "grn"
+      ],
+      "license": "GPL-3.0",
+      "weights_open": true,
+      "notes": "LoRA-finetuned Llama-3.1-8B that recasts expression profiles and PPI networks as natural-language question-answer pairs; acts as encoder, predictor and explainer in one model."
     }
   ]
 }
