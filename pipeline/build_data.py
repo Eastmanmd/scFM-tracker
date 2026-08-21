@@ -2,7 +2,8 @@
 
 Writes:
   data/models.json     one row per model: specs, metrics, score breakdown
-  data/citations.json  recent citing articles per model, labelled on both axes
+  data/citations.json  index of recent citing articles per model, both axes
+  data/citations/<id>.json  every citing article for one model, lazily fetched
   data/history.json    append-only weekly snapshot (drives deltas + momentum)
   data/meta.json       provenance and corpus-level summary
 """
@@ -142,7 +143,8 @@ def main():
             baseline = snap
 
     rows = []
-    citations_out = {}
+    citations_out = {}     # index: top N per model, loaded upfront
+    citations_full = {}    # every citing article, one file per model
 
     for model in registry["models"]:
         mid = model["id"]
@@ -196,13 +198,18 @@ def main():
             "_upkeep_raw": upkeep,
         })
         # Drop the classifier's raw inputs before they reach the browser --
-        # abstracts alone would multiply data/citations.json several times over
-        # for text nothing on the page renders.
-        citations_out[mid] = [
+        # abstracts alone would multiply the payload several times over for
+        # text nothing on the page renders.
+        full = [
             dict((k, v) for k, v in rec.items()
                  if k not in ("abstract", "topic_names", "has_abstract"))
             for rec in oa.get("citing", [])
         ]
+        # The whole list goes in the model's own file, fetched only when its
+        # page is opened. The index keeps the most recent few, which is what
+        # the leaderboard and the cross-model feed read on first load.
+        citations_full[mid] = full
+        citations_out[mid] = full[:config.CITING_PER_MODEL]
 
     # ---- score components ---------------------------------------------------
     attention = normalize(dict((r["id"], math.log1p(r["citations"])) for r in rows))
@@ -272,6 +279,18 @@ def main():
     with open(os.path.join(config.DATA_DIR, "citations.json"), "w") as fh:
         json.dump(citations_out, fh)
 
+    # One file per model. Stale files are removed rather than left behind: a
+    # model dropped from the registry would otherwise keep serving a citing
+    # list that nothing on the site can reach or refresh.
+    if not os.path.isdir(config.CITING_DIR):
+        os.makedirs(config.CITING_DIR)
+    for name in os.listdir(config.CITING_DIR):
+        if name.endswith(".json") and name[:-5] not in citations_full:
+            os.remove(os.path.join(config.CITING_DIR, name))
+    for mid, records in citations_full.items():
+        with open(os.path.join(config.CITING_DIR, mid + ".json"), "w") as fh:
+            json.dump(records, fh)
+
     total_citations = sum(r["citations"] for r in rows)
     use_totals = {}
     for row in rows:
@@ -295,6 +314,8 @@ def main():
         "domain_totals": domain_totals,
         "biology_share": biology_share(domain_totals),
         "unique_citing_works": corpus.get("unique_citing_works", 0),
+        "citing_index_per_model": config.CITING_PER_MODEL,
+        "citing_records_total": sum(len(v) for v in citations_full.values()),
         "sources": ["OpenAlex", "GitHub", "Hugging Face Hub"],
     }
     with open(os.path.join(config.DATA_DIR, "meta.json"), "w") as fh:

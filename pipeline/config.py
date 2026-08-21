@@ -47,7 +47,11 @@ SCORE_WEIGHTS = {
 }
 MOMENTUM_WEEKS = 8       # window for the citation-delta component
 STALE_DAYS = 90          # no commits in this long => repo is "quiet"
-CITING_PER_MODEL = 60    # most-recent citing articles kept per model
+# The full citing list for every model ships in data/citations/<id>.json and is
+# fetched only when a model page is opened. data/citations.json is the index the
+# leaderboard and the cross-model feed read on load, capped per model so the
+# first paint does not carry scGPT's 1,300 rows.
+CITING_PER_MODEL = 40    # citing articles kept in the upfront index
 
 # Files
 RESOLVED_FILE = os.path.join(CACHE_DIR, "resolved.json")
@@ -60,3 +64,6 @@ DISCOVERY_FILE = os.path.join(CACHE_DIR, "discovery.json")
 # data/history.json is append-only and lives in the repo, not the cache --
 # weekly snapshots are the only way deltas and momentum can be computed.
 HISTORY_FILE = os.path.join(DATA_DIR, "history.json")
+
+# One file per model, holding every citing article rather than the index's top N.
+CITING_DIR = os.path.join(DATA_DIR, "citations")

@@ -221,7 +221,9 @@ def main():
             "domain_counts": domain_counts,
             "abstract_coverage": (round(with_abstract / float(len(records)), 3)
                                   if records else 0.0),
-            "citing": records[:config.CITING_PER_MODEL],
+            # Full list, unsliced. build_data.py decides what ships upfront
+            # and what goes into the lazily-fetched per-model file.
+            "citing": records,
         }
         print("{:<18} {:>5} citations ({} versions, naive sum {})".format(
             mid, out[mid]["citations_total"], len(versions),

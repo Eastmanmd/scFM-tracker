@@ -2,6 +2,16 @@
    client-side. No build step, no dependencies. */
 
 var DATA = {models: [], citations: {}, meta: {}, history: {snapshots: []}};
+
+/* data/citations.json carries only the most recent few articles per model so the
+   first paint stays small. A model's complete citing list lives in its own file
+   and is pulled the first time its page is opened, then kept for the session.
+   citingFull[id] is undefined until fetched, null while in flight, and false if
+   the fetch failed -- so a failure falls back to the index instead of retrying
+   on every re-render. */
+var citingFull = {};
+var CITING_PAGE = 100;   // rows revealed per "show more" click
+var citingShown = CITING_PAGE;
 var WEIGHT_KEYS = ["attention", "momentum", "usage", "openness"];
 var WEIGHT_LABELS = {
   attention: "Attention (citations)",
@@ -264,11 +274,32 @@ function bioShareCell(mo) {
 }
 
 /* ---------- model detail ---------- */
+function loadCiting(id) {
+  if (citingFull[id] !== undefined) return;
+  citingFull[id] = null;
+  fetch("data/citations/" + encodeURIComponent(id) + ".json")
+    .then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.json();
+    })
+    .then(function (recs) { citingFull[id] = recs; })
+    .catch(function () { citingFull[id] = false; })
+    .then(function () {
+      // Only repaint if the reader is still on this model's page.
+      if (!el("view-detail").hidden && el("view-detail").dataset.model === id) {
+        renderDetail(id);
+      }
+    });
+}
+
 function renderDetail(id) {
   var mo = DATA.models.filter(function (m) { return m.id === id; })[0];
   if (!mo) return;
-  var arts = DATA.citations[id] || [];
+  loadCiting(id);
+  var full = citingFull[id];
+  var arts = full || DATA.citations[id] || [];
   var uses = mo.use_counts || {};
+  el("view-detail").dataset.model = id;
 
   var specs = [
     [compact(mo.params), "parameters"], [compact(mo.cells), "pretraining cells"],
@@ -321,10 +352,18 @@ function renderDetail(id) {
     '<p class="sub">' + ["application", "benchmark", "extension", "review"].map(function (u) {
       return '<span class="use-' + u + '">' + u + ": " + (uses[u] || 0) + "</span>";
     }).join(" · ") + "</p>" +
-    "<h2>Most recent citing articles</h2>" +
-    arts.map(articleRow).join("") + "</div>";
+    "<h2>Citing articles</h2>" + citingNote(mo, arts, full) +
+    arts.slice(0, citingShown).map(articleRow).join("") +
+    (arts.length > citingShown
+      ? '<button class="chip" id="more-citing">Show ' +
+        Math.min(CITING_PAGE, arts.length - citingShown) + " more</button>"
+      : "") + "</div>";
 
   el("back-btn").onclick = function () { show("models"); };
+  var more = el("more-citing");
+  if (more) {
+    more.onclick = function () { citingShown += CITING_PAGE; renderDetail(id); };
+  }
 }
 
 /* The method/biology split, with the abstentions kept visible. Hiding
@@ -359,6 +398,23 @@ function domainPanel(mo) {
     "text — so this counts what kind of work cites the model, which is not the same as what " +
     "kind of work <em>runs</em> it. A biology paper citing the model once in its introduction " +
     "still counts here.</p>";
+}
+
+/* The count matters here: the score, the year histogram and the field split are
+   all computed over every citation, so a page showing a truncated list has to
+   say so rather than let the reader read the visible rows as the whole corpus. */
+function citingNote(mo, arts, full) {
+  var shown = Math.min(citingShown, arts.length);
+  // Most models have fewer citations than the index cap, so their index *is*
+  // the whole list -- no point warning about a fetch that will not add a row.
+  if (!full && arts.length < mo.citations) {
+    return '<p class="sub">Showing the ' + num(shown) + " most recent of " +
+      num(mo.citations) + (full === false
+        ? ". The full list could not be loaded.</p>"
+        : " — loading the rest…</p>");
+  }
+  return '<p class="sub">Showing ' + num(shown) + " of " + num(arts.length) +
+    ", most recent first.</p>";
 }
 
 function articleRow(a) {
@@ -623,7 +679,9 @@ function renderCitations() {
         " · " + (a.date || a.year || "") + "</div></div>";
     }).join("") +
     '<p class="sub">Showing ' + Math.min(300, shown.length) + " of " + shown.length +
-    " recent citing articles (most recent " + DATA.meta.models_tracked + " per model retained).</p></div>";
+    " — this feed indexes the " + DATA.meta.citing_index_per_model +
+    " most recent citing articles per model. Open a model to see all " +
+    num(DATA.meta.citing_records_total) + " on record.</p></div>";
 }
 
 /* ---------- about ---------- */
@@ -682,7 +740,10 @@ function show(view, arg) {
   if (view === "matrix") renderMatrix();
   if (view === "citations") renderCitations();
   if (view === "about") renderAbout();
-  if (view === "detail") renderDetail(arg);
+  if (view === "detail") {
+    if (el("view-detail").dataset.model !== arg) citingShown = CITING_PAGE;
+    renderDetail(arg);
+  }
 }
 
 document.addEventListener("click", function (e) {
