@@ -1,5 +1,7 @@
 # Single-Cell Foundation Model Tracker
 
+**Live site: https://eastmanmd.github.io/scFM-tracker/**
+
 A dashboard that tracks every single-cell RNA-seq foundation model and measures
 three things that usually disagree: how much a model is **cited**, how much it
 is actually **downloaded and starred**, and how recently anyone **touched the
@@ -52,8 +54,8 @@ Two related data-quality rules:
 
 ## How citing articles are classified
 
-Every citing paper carries two independent labels, assigned by
-`pipeline/classify.py` from its title, abstract, and OpenAlex topics.
+Every citing paper carries two independent labels, assigned from its title,
+abstract, and OpenAlex topics.
 
 **Use** — what the paper does with the model: **application** (used it),
 **benchmark** (evaluated or compared it), **extension** (built on it), or
@@ -80,77 +82,13 @@ Two limits are worth stating plainly:
   name-checks a model once in its introduction still counts as a biology
   citation. Separating use from mention needs full text, which OpenAlex does
   not carry.
-- **The classifier is rules-based and imperfect.** Measured against
-  `pipeline/labels.json` (92 hand-labelled papers): 89% accurate overall, 95%
-  on the papers it chose to call, abstaining on 7%. It is weakest on papers
-  that are genuinely both — a new method whose whole point is a biological
-  finding.
+- **The classifier is rules-based and imperfect.** Measured against 92
+  hand-labelled papers: 89% accurate overall, 95% on the papers it chose to
+  call, abstaining on 7%. It is weakest on papers that are genuinely both — a
+  new method whose whole point is a biological finding.
 
 Abstracts cover 83–93% of citing works and ride along in the same paged
 OpenAlex request, so the second axis costs no extra API calls.
-
-### Changing the classifier
-
-`pipeline/labels.json` is the ground truth. Cached citing records keep their
-abstract and topics, so re-labelling never re-pages OpenAlex:
-
-```
-python3 pipeline/validate_classifier.py --errors
-```
-
-Edit `pipeline/classify.py`, rerun that, and compare. Read per-class recall and
-coverage, not just accuracy — biology is the minority class, and a classifier
-that answered "method" for everything would still score 76%. When you disagree
-with a label the site shows, add that work id to `labels.json` first, then
-tune.
-
-## The registry
-
-`pipeline/registry.json` is the only hand-maintained file — there is no
-ontology of "single-cell foundation model," so membership is a curation
-decision. Each entry pins the paper versions (by title or by OpenAlex ID), the
-GitHub repo, and the Hugging Face weights. `pipeline/resolve_ids.py` verifies
-every one of those IDs against the live APIs and reports anything that fails to
-resolve, so a renamed repo or a retracted DOI surfaces as an error rather than
-as a silent zero.
-
-## Layout
-
-```
-index.html  app.js  styles.css        static site, no build step
-pipeline/
-  registry.json      curated model registry (hand-edited)
-  config.py          endpoints, weights, thresholds
-  resolve_ids.py     verify every DOI / repo / weights id
-  classify.py        two-axis labelling of citing papers
-  labels.json        hand-labelled ground truth for the classifier
-  validate_classifier.py  score classify.py against labels.json
-  fetch_openalex.py  citations, yearly trend, citing articles
-  fetch_github.py    stars, forks, last commit
-  fetch_hf.py        weight downloads
-  build_data.py      score, snapshot, write data/*.json
-  run_all.py         orchestrates the above
-data/
-  models.json        one row per model
-  citations.json     recent citing articles per model, labelled on both axes
-  history.json       append-only weekly snapshots (drives deltas)
-  meta.json          provenance
-```
-
-`data/history.json` is append-only and committed to the repo. Weekly deltas and
-the momentum component cannot be backfilled from any API, so the snapshot is
-written from the very first run even before anything reads it.
-
-## Running it
-
-```bash
-pip install requests
-python pipeline/run_all.py
-python -m http.server 8000   # then open http://localhost:8000
-```
-
-The weekly GitHub Action (`.github/workflows/refresh-data.yml`) runs the same
-pipeline every Monday at 06:00 UTC and commits any changed data.
 
 ---
 
