@@ -45,7 +45,10 @@ SCORE_WEIGHTS = {
     "usage": 0.20,       # Hugging Face downloads + GitHub stars
     "openness": 0.20,    # open weights + permissive license + active upkeep
 }
-MOMENTUM_WEEKS = 8       # window for the citation-delta component
+# Momentum window. Counted from the publication dates carried on the citing
+# records themselves, not from snapshot arithmetic, so it is exact on the first
+# run and retroactive for every model rather than waiting on history to deepen.
+MOMENTUM_WINDOW_DAYS = 365
 STALE_DAYS = 90          # no commits in this long => repo is "quiet"
 # The full citing list for every model ships in data/citations/<id>.json and is
 # fetched only when a model page is opened. data/citations.json is the index the

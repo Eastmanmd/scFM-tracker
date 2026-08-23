@@ -304,6 +304,7 @@ function renderDetail(id) {
   var specs = [
     [compact(mo.params), "parameters"], [compact(mo.cells), "pretraining cells"],
     [num(mo.citations), "citations (deduped)"], [num(mo.citations_naive_sum), "naive version sum"],
+    [num(mo.citations_12m), "citations, last 12 months"],
     [mo.github ? num(mo.stars) : "—", "GitHub stars"],
     [mo.hf ? num(mo.downloads) : "—", "HF downloads / 30d"],
     [mo.upkeep, "upkeep"], [mo.velocity, "citation velocity" + (mo.velocity_ratio ? " (" + mo.velocity_ratio + "×)" : "")]
@@ -695,8 +696,10 @@ function renderAbout() {
     }).join(", ") + ". The leaderboard sliders re-weight everything live.</p>" +
     "<ul><li><strong>Attention</strong> — log-scaled total citations, deduplicated across every " +
     "version of the model paper.</li>" +
-    "<li><strong>Momentum</strong> — citations gained recently. Currently derived from " +
-    esc(m.momentum_basis) + "; once enough weekly snapshots accumulate this switches to a measured delta.</li>" +
+    "<li><strong>Momentum</strong> — citations gained recently: " + esc(m.momentum_basis) +
+    ", counted from the publication date on each citing paper rather than from the " +
+    "difference between two weekly snapshots. That makes it exact from the first run and " +
+    "equally valid for a model added yesterday.</li>" +
     "<li><strong>Usage</strong> — Hugging Face downloads plus GitHub stars. Absent Hugging Face " +
     "numbers mean weights are distributed elsewhere, not that nobody uses the model.</li>" +
     "<li><strong>Openness &amp; upkeep</strong> — open weights, license permissiveness, and days " +

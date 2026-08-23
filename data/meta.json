@@ -1,5 +1,5 @@
 {
- "updated": "2026-08-21",
+ "updated": "2026-08-22",
  "models_tracked": 19,
  "total_citations": 4665,
  "open_weights": 19,
@@ -10,8 +10,9 @@
   "usage": 0.2,
   "openness": 0.2
  },
- "momentum_basis": "share of citations from the last two years (no history yet)",
- "history_depth": 4,
+ "momentum_basis": "citations dated in the trailing 365 days",
+ "momentum_window_days": 365,
+ "history_depth": 5,
  "use_totals": {
   "application": 3760,
   "extension": 208,

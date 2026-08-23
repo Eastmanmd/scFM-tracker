@@ -23,12 +23,30 @@ normalized components:
 | Component | What it measures |
 |---|---|
 | **Attention** (×0.35) | Log-scaled total citations, deduplicated across every version of the model paper |
-| **Momentum** (×0.25) | Citations gained recently — measured from weekly snapshots once enough history exists, and from the share of citations in the last two years before that |
+| **Momentum** (×0.25) | Citations gained in the last 365 days, counted from the publication date on each citing paper |
 | **Usage** (×0.20) | Hugging Face downloads plus GitHub stars — did anyone pull the weights, not just cite the paper |
 | **Openness & upkeep** (×0.20) | Open weights, license permissiveness, and days since the last commit |
 
 Sliders on the leaderboard re-weight everything live and write the weighting
 into the URL, so a particular ranking is a shareable link (`…/#w=0.35,0.25,0.20,0.20`).
+
+## Momentum is counted, not inferred
+
+Every citing record carries the citing paper's publication date, so the
+trailing-year count is read straight off the corpus — exact on the first run,
+and equally valid for a model added yesterday.
+
+The earlier scheme switched between two different measures depending on how
+much snapshot history had accumulated: an absolute citation delta once weekly
+snapshots were deep enough, and the *share* of citations from the last two
+years before that. A count and a ratio do not rank models the same way, so the
+leaderboard would have reshuffled on whichever week the branch flipped, for a
+reason no reader could see. The ratio was also nearly useless on its own terms
+— it saturated at 1.0 for every model young enough that all of its citations
+were recent, which was most of the field.
+
+Weekly snapshots still drive the week-over-week deltas shown next to each
+citation and star count.
 
 ## Citations are deduplicated across paper versions
 

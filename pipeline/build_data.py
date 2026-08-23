@@ -4,7 +4,7 @@ Writes:
   data/models.json     one row per model: specs, metrics, score breakdown
   data/citations.json  index of recent citing articles per model, both axes
   data/citations/<id>.json  every citing article for one model, lazily fetched
-  data/history.json    append-only weekly snapshot (drives deltas + momentum)
+  data/history.json    append-only weekly snapshot (drives week-over-week deltas)
   data/meta.json       provenance and corpus-level summary
 """
 import datetime
@@ -91,6 +91,23 @@ def upkeep_score(gh, hfd, today):
     return 0.2, days, "dormant"
 
 
+def trailing_citations(records, window_start):
+    """Citing papers published on or after window_start.
+
+    Counted from the publication date on each citing record rather than from
+    the difference between two weekly snapshots. Snapshot arithmetic cannot
+    report anything until two snapshots exist and needs a full window before
+    the number means what it says; the dates are already on every record, so
+    this is exact on the first run and identical for a model added tomorrow.
+
+    No upper bound: journals routinely stamp a record with a future issue date,
+    and those citations are real and recent. Records with no date at all are
+    skipped, which is currently none of the 4,665 in the corpus.
+    """
+    return sum(1 for rec in records
+               if (rec.get("date") or "") >= window_start)
+
+
 MIN_PRIOR_FOR_VELOCITY = 10
 
 
@@ -134,13 +151,10 @@ def main():
         if snap["date"] != today_iso:
             previous = snap
             break
-    # The snapshot closest to MOMENTUM_WEEKS ago drives the momentum component.
-    target = today - datetime.timedelta(weeks=config.MOMENTUM_WEEKS)
-    baseline = None
-    for snap in snapshots:
-        snap_date = datetime.date(*[int(x) for x in snap["date"].split("-")])
-        if snap_date <= target and snap["date"] != today_iso:
-            baseline = snap
+    # Momentum reads the citing records' own dates, so it needs no baseline
+    # snapshot. History still drives the week-over-week deltas on the table.
+    window_start = (today - datetime.timedelta(
+        days=config.MOMENTUM_WINDOW_DAYS)).isoformat()
 
     rows = []
     citations_out = {}     # index: top N per model, loaded upfront
@@ -160,7 +174,7 @@ def main():
         vel_label, vel_ratio = velocity(counts_by_year, this_year)
 
         prev_row = (previous or {}).get("models", {}).get(mid, {})
-        base_row = (baseline or {}).get("models", {}).get(mid, {})
+        citations_12m = trailing_citations(oa.get("citing", []), window_start)
 
         rows.append({
             "id": mid,
@@ -176,6 +190,7 @@ def main():
             "papers": oa.get("versions", []),
             "citations": citations,
             "citations_naive_sum": oa.get("citations_naive_sum", 0),
+            "citations_12m": citations_12m,
             "counts_by_year": counts_by_year,
             "use_counts": oa.get("use_counts", {}),
             "domain_counts": oa.get("domain_counts", {}),
@@ -193,8 +208,6 @@ def main():
                                 if "citations" in prev_row else None),
             "stars_delta": (stars - prev_row["stars"]
                             if "stars" in prev_row else None),
-            "citations_delta_window": (citations - base_row["citations"]
-                                       if "citations" in base_row else None),
             "_upkeep_raw": upkeep,
         })
         # Drop the classifier's raw inputs before they reach the browser --
@@ -216,21 +229,16 @@ def main():
     usage = normalize(dict(
         (r["id"], math.log1p(r["stars"]) + math.log1p(r["downloads"])) for r in rows))
 
-    # Momentum prefers a real measured delta; until history is deep enough it
-    # falls back to the share of citations arriving in the last two years.
-    have_baseline = any(r["citations_delta_window"] is not None for r in rows)
-    if have_baseline:
-        momentum_raw = dict(
-            (r["id"], math.log1p(max(0, r["citations_delta_window"] or 0)))
-            for r in rows)
-        momentum_basis = "measured {}-week citation delta".format(config.MOMENTUM_WEEKS)
-    else:
-        def recent_share(row):
-            counts = dict((int(k), v) for k, v in row["counts_by_year"].items())
-            recent = sum(counts.get(y, 0) for y in (this_year, this_year - 1))
-            return recent / float(row["citations"]) if row["citations"] else 0.0
-        momentum_raw = dict((r["id"], recent_share(r)) for r in rows)
-        momentum_basis = "share of citations from the last two years (no history yet)"
+    # Momentum is the count of citations arriving in the trailing window, read
+    # off the citing papers' own publication dates. This replaces a two-branch
+    # scheme that measured different things depending on how much history had
+    # accumulated -- an absolute delta once snapshots were deep enough, and the
+    # *share* of citations from the last two years before that. A count and a
+    # ratio rank models differently, so the leaderboard would have reshuffled
+    # on the week the branch flipped, for no reason a reader could see.
+    momentum_raw = dict((r["id"], math.log1p(r["citations_12m"])) for r in rows)
+    momentum_basis = "citations dated in the trailing {} days".format(
+        config.MOMENTUM_WINDOW_DAYS)
     momentum = normalize(momentum_raw)
 
     openness = {}
@@ -309,6 +317,7 @@ def main():
         "actively_maintained": sum(1 for r in rows if r["upkeep"] == "active"),
         "weights": weights,
         "momentum_basis": momentum_basis,
+        "momentum_window_days": config.MOMENTUM_WINDOW_DAYS,
         "history_depth": len(snapshots),
         "use_totals": use_totals,
         "domain_totals": domain_totals,
@@ -321,12 +330,13 @@ def main():
     with open(os.path.join(config.DATA_DIR, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=1)
 
-    print("{:<4}{:<20}{:>7}{:>8}{:>9}{:>8}  {}".format(
-        "#", "model", "score", "cites", "stars", "dl/30d", "upkeep"))
+    print("{:<4}{:<20}{:>7}{:>8}{:>7}{:>9}{:>8}  {}".format(
+        "#", "model", "score", "cites", "12mo", "stars", "dl/30d", "upkeep"))
     for row in rows:
-        print("{:<4}{:<20}{:>7}{:>8}{:>9}{:>8}  {} / {}".format(
+        print("{:<4}{:<20}{:>7}{:>8}{:>7}{:>9}{:>8}  {} / {}".format(
             row["rank"], row["name"][:19], row["score"], row["citations"],
-            row["stars"], row["downloads"], row["upkeep"], row["velocity"]))
+            row["citations_12m"], row["stars"], row["downloads"],
+            row["upkeep"], row["velocity"]))
     print("\nmomentum basis: {}".format(momentum_basis))
     print("history depth: {} snapshot(s)".format(len(snapshots)))
 
