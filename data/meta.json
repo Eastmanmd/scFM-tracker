@@ -1,7 +1,7 @@
 {
- "updated": "2026-08-22",
+ "updated": "2026-08-24",
  "models_tracked": 19,
- "total_citations": 4665,
+ "total_citations": 4690,
  "open_weights": 19,
  "actively_maintained": 7,
  "weights": {
@@ -12,23 +12,23 @@
  },
  "momentum_basis": "citations dated in the trailing 365 days",
  "momentum_window_days": 365,
- "history_depth": 5,
+ "history_depth": 6,
  "use_totals": {
-  "application": 3760,
+  "application": 3779,
   "extension": 208,
-  "review": 337,
-  "benchmark": 360
+  "review": 341,
+  "benchmark": 362
  },
  "domain_totals": {
-  "method": 1455,
-  "unclear": 412,
-  "biology": 212,
+  "method": 1463,
+  "unclear": 418,
+  "biology": 213,
   "offtopic": 159
  },
  "biology_share": 0.127,
- "unique_citing_works": 2238,
+ "unique_citing_works": 2253,
  "citing_index_per_model": 40,
- "citing_records_total": 4665,
+ "citing_records_total": 4690,
  "sources": [
   "OpenAlex",
   "GitHub",
