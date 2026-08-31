@@ -677,6 +677,125 @@
      "biology_share": null
     }
    }
+  },
+  {
+   "date": "2026-08-31",
+   "models": {
+    "scgpt": {
+     "citations": 1350,
+     "stars": 1620,
+     "downloads": 0,
+     "biology_share": 0.1
+    },
+    "geneformer": {
+     "citations": 1151,
+     "stars": 0,
+     "downloads": 3061,
+     "biology_share": 0.118
+    },
+    "scfoundation": {
+     "citations": 618,
+     "stars": 427,
+     "downloads": 0,
+     "biology_share": 0.057
+    },
+    "scbert": {
+     "citations": 637,
+     "stars": 361,
+     "downloads": 0,
+     "biology_share": 0.04
+    },
+    "state": {
+     "citations": 73,
+     "stars": 653,
+     "downloads": 336,
+     "biology_share": 0.133
+    },
+    "uce": {
+     "citations": 175,
+     "stars": 334,
+     "downloads": 0,
+     "biology_share": 0.063
+    },
+    "nicheformer": {
+     "citations": 140,
+     "stars": 170,
+     "downloads": 0,
+     "biology_share": 0.119
+    },
+    "genecompass": {
+     "citations": 149,
+     "stars": 122,
+     "downloads": 0,
+     "biology_share": 0.041
+    },
+    "cellfm": {
+     "citations": 78,
+     "stars": 111,
+     "downloads": 0,
+     "biology_share": 0.129
+    },
+    "cell2sentence": {
+     "citations": 62,
+     "stars": 878,
+     "downloads": 0,
+     "biology_share": 0.019
+    },
+    "scprint": {
+     "citations": 45,
+     "stars": 157,
+     "downloads": 0,
+     "biology_share": 0.077
+    },
+    "cellplm": {
+     "citations": 74,
+     "stars": 106,
+     "downloads": 0,
+     "biology_share": 0.0
+    },
+    "aido-cell": {
+     "citations": 15,
+     "stars": 125,
+     "downloads": 717,
+     "biology_share": 0.0
+    },
+    "transcriptformer": {
+     "citations": 29,
+     "stars": 158,
+     "downloads": 0,
+     "biology_share": 0.08
+    },
+    "scmulan": {
+     "citations": 33,
+     "stars": 63,
+     "downloads": 0,
+     "biology_share": 0.0
+    },
+    "scimilarity": {
+     "citations": 40,
+     "stars": 259,
+     "downloads": 0,
+     "biology_share": 0.188
+    },
+    "tgpt": {
+     "citations": 72,
+     "stars": 0,
+     "downloads": 0,
+     "biology_share": 0.077
+    },
+    "cellhermes": {
+     "citations": 1,
+     "stars": 31,
+     "downloads": 82,
+     "biology_share": 0.0
+    },
+    "langcell": {
+     "citations": 5,
+     "stars": 71,
+     "downloads": 0,
+     "biology_share": 0.0
+    }
+   }
   }
  ]
 }
