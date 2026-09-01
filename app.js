@@ -192,6 +192,13 @@ var LOG_LABEL = {
   first_comparison: "first comparison"
 };
 
+/* Only http(s) becomes a link. Event urls are OpenAlex DOIs today, so this
+   guards nothing that exists yet -- but the same events feed a reader, and a
+   javascript: href is not worth carrying for a one-line check. */
+function safeLink(url) {
+  return /^https?:\/\//.test(String(url || ""));
+}
+
 function changelogCard() {
   var log = DATA.changelog;
   if (!log || !log.entries || !log.entries.length) return "";
@@ -206,7 +213,7 @@ function changelogCard() {
         ? events.map(function (ev) {
             return '<div class="log-item"><span class="log-kind k-' + esc(ev.type || "") +
               '">' + esc(LOG_LABEL[ev.type] || "change") + "</span><span>" + esc(ev.text) +
-              (ev.url ? ' <a href="' + esc(ev.url) + '" rel="noopener">DOI</a>' : "") +
+              (safeLink(ev.url) ? ' <a href="' + esc(ev.url) + '" rel="noopener">DOI</a>' : "") +
               "</span></div>";
           }).join("")
         : '<div class="log-item"><span class="log-kind">quiet</span><span>Nothing ' +

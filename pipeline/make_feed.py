@@ -40,6 +40,18 @@ KIND_LABEL = {
 }
 
 
+def safe_link(url):
+    """A URL only becomes a link if it is http(s).
+
+    Every url on an event today is an OpenAlex DOI, so this guards against
+    nothing that currently exists -- but the feed is the one output rendered
+    inside someone else's reader, and a `javascript:` href reaching that far
+    is not a risk worth carrying for a two-line check.
+    """
+    url = (url or "").strip()
+    return url if url[:7] == "http://" or url[:8] == "https://" else ""
+
+
 def rfc3339(date_str):
     """A changelog date is a day; Atom wants an instant. 06:00 UTC is when the
     weekly Action is scheduled, so it is the closest honest reading."""
@@ -61,8 +73,9 @@ def entry_content(entry):
     for ev in entry.get("events", []):
         label = KIND_LABEL.get(ev.get("type"), "Change")
         text = escape(ev.get("text", ""))
-        if ev.get("url"):
-            text += ' <a href="{}">{}</a>'.format(escape(ev["url"]), "DOI")
+        href = safe_link(ev.get("url"))
+        if href:
+            text += ' <a href="{}">DOI</a>'.format(escape(href, {'"': "&quot;"}))
         items.append("<li><strong>{}</strong> — {}</li>".format(escape(label), text))
     if not items:
         items.append("<li>No tracked field changed this week.</li>")
