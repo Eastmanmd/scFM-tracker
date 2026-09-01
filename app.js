@@ -1,7 +1,7 @@
 /* Single-Cell Foundation Model Tracker — reads data/*.json, renders everything
    client-side. No build step, no dependencies. */
 
-var DATA = {models: [], citations: {}, meta: {}, history: {snapshots: []}, h2h: null};
+var DATA = {models: [], citations: {}, meta: {}, history: {snapshots: []}, h2h: null, changelog: null};
 
 /* data/citations.json carries only the most recent few articles per model so the
    first paint stays small. A model's complete citing list lives in its own file
@@ -24,6 +24,7 @@ var sortKey = "score", sortDir = -1;
 var filters = {};
 var TASKS = ["annotation", "integration", "imputation", "perturbation", "grn", "spatial"];
 var h2hPair = null;   // "modelA|modelB" while a matrix cell is selected
+var logWeeks = 1;     // changelog weeks shown on the leaderboard card
 
 /* ---------- helpers ---------- */
 function el(id) { return document.getElementById(id); }
@@ -173,6 +174,58 @@ function activeModels() {
   });
 }
 
+/* ---------- what changed since the last refresh ----------
+   The site refreshes every Monday and until now said nothing about what moved,
+   which made it a thing you had to remember to check. The card reads the same
+   data/changelog.json that feed.xml is built from, so the page and the feed
+   can never disagree. */
+
+var LOG_LABEL = {
+  baseline: "start",
+  model_added: "new model",
+  rank_move: "rank",
+  upkeep: "upkeep",
+  license: "licence",
+  milestone: "milestone",
+  benchmark_paper: "evaluation",
+  citing: "citations",
+  first_comparison: "first comparison"
+};
+
+function changelogCard() {
+  var log = DATA.changelog;
+  if (!log || !log.entries || !log.entries.length) return "";
+  var entries = log.entries.slice().reverse();
+  var shown = entries.slice(0, logWeeks);
+
+  var weeks = shown.map(function (entry) {
+    var events = entry.events || [];
+    return '<div class="log-week"><div class="log-date">' + esc(entry.date) +
+      (entries.length > 1 && entry === entries[0] ? " · latest refresh" : "") + "</div>" +
+      (events.length
+        ? events.map(function (ev) {
+            return '<div class="log-item"><span class="log-kind k-' + esc(ev.type || "") +
+              '">' + esc(LOG_LABEL[ev.type] || "change") + "</span><span>" + esc(ev.text) +
+              (ev.url ? ' <a href="' + esc(ev.url) + '" rel="noopener">DOI</a>' : "") +
+              "</span></div>";
+          }).join("")
+        : '<div class="log-item"><span class="log-kind">quiet</span><span>Nothing ' +
+          "tracked changed this week.</span></div>") + "</div>";
+  }).join("");
+
+  return '<div class="card log-card"><h2>What changed</h2>' +
+    '<p class="sub">Every Monday the pipeline re-reads all three sources; this is the ' +
+    "difference from the run before. Rank moves are reported only when a model shifts at " +
+    "least two places <em>and</em> its score moves by half a point, so a pair of neighbours " +
+    "trading places on rounding does not read as news. " +
+    '<a href="feed.xml">Atom feed</a>.</p>' + weeks +
+    (entries.length > logWeeks
+      ? '<button class="chip" id="log-more">Show earlier weeks</button>'
+      : (logWeeks > 1
+          ? '<button class="chip" id="log-less">Show only the latest</button>' : "")) +
+    "</div>";
+}
+
 function renderModels() {
   var rows = activeModels().map(function (mo) {
     var copy = Object.create(mo);
@@ -212,6 +265,7 @@ function renderModels() {
   ];
 
   el("view-models").innerHTML =
+    changelogCard() +
     '<div class="card"><h2>Weight the score yourself</h2>' +
     '<div class="controls">' + sliders + "</div>" +
     '<div class="filters">' + chips.map(function (c) {
@@ -255,6 +309,8 @@ function renderModels() {
     }).join("") + "</tbody></table></div>" +
     '<p class="sub">' + rows.length + " of " + DATA.models.length +
     " models shown. Click a model name for its detail page.</p></div>";
+
+  bindChangelogButtons();
 }
 
 /* Share of a model's classified citations that are biology work, rendered as a
@@ -262,6 +318,12 @@ function renderModels() {
    model is a methods plaything, or simply that biologists cite the tool paper
    less than tool-builders do. The page states the ambiguity rather than
    resolving it with a colour. */
+function bindChangelogButtons() {
+  var more = el("log-more"), less = el("log-less");
+  if (more) more.onclick = function () { logWeeks += 4; renderModels(); };
+  if (less) less.onclick = function () { logWeeks = 1; renderModels(); };
+}
+
 function bioShareCell(mo) {
   if (mo.biology_share == null) return "—";
   var pct = Math.round(mo.biology_share * 100);
@@ -914,6 +976,20 @@ function renderAbout() {
         "the same table. An empty cell means no such paper was found, which for a model " +
         "published this year is the expected state rather than a poor result.</p>"
       : "<p class='sub'>Not available on this deployment.</p>") + "</div>" +
+    '<div class="card"><h2>What changed, and the feed</h2>' +
+    "<p>Every refresh is diffed against the one before it and written to " +
+    "<code>data/changelog.json</code>, which the card on the leaderboard and " +
+    "<a href='feed.xml'>feed.xml</a> both read — so the page and the feed cannot " +
+    "disagree about what happened.</p>" +
+    "<p class='sub'>Reported: models joining, rank moves, repositories going quiet or " +
+    "being archived, licence changes, citation milestones, newly indexed benchmarking " +
+    "papers, and the first time two models are jointly evaluated. A rank move has to " +
+    "clear two places <em>and</em> half a score point, because neighbours a tenth of a " +
+    "point apart would otherwise swap places most weeks for no reason worth reading.</p>" +
+    "<p class='sub'>\"New\" means new to this tracker, not newly published: a 2024 paper " +
+    "OpenAlex indexed last week is reported the week it arrives. Reviewed-preprint " +
+    "versions of the same paper are collapsed by title, so a paper is announced once " +
+    "rather than once per version.</p></div>" +
     '<div class="card"><h2>Data sources</h2><p class="sub">' +
     (m.sources || []).join(" · ") + ". Updated " + m.updated + ", from " + m.history_depth +
     " weekly snapshot(s).</p></div>";
@@ -1003,6 +1079,9 @@ Promise.all(["models", "citations", "meta", "history"].map(function (f) {
   // file should still render everything else rather than fail to paint.
   fetch("data/headtohead.json")
     .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; }),
+  fetch("data/changelog.json")
+    .then(function (r) { return r.ok ? r.json() : null; })
     .catch(function () { return null; })
 ])).then(function (res) {
   DATA.models = res[0].models;
@@ -1010,6 +1089,7 @@ Promise.all(["models", "citations", "meta", "history"].map(function (f) {
   DATA.meta = res[2];
   DATA.history = res[3];
   DATA.h2h = res[4];
+  DATA.changelog = res[5];
   if (DATA.meta.weights) {
     WEIGHT_KEYS.forEach(function (k) { weights[k] = DATA.meta.weights[k]; });
   }

@@ -11,6 +11,7 @@ STEPS = [
     "fetch_github.py",    # stars, forks, last commit
     "fetch_hf.py",        # weight downloads
     "build_data.py",      # score, snapshot history, write data/*.json
+    "make_feed.py",       # publish data/changelog.json as feed.xml
 ]
 
 for step in STEPS:

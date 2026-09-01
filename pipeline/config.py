@@ -68,5 +68,23 @@ DISCOVERY_FILE = os.path.join(CACHE_DIR, "discovery.json")
 # weekly snapshots are the only way deltas and momentum can be computed.
 HISTORY_FILE = os.path.join(DATA_DIR, "history.json")
 
+# Week-over-week changelog and the Atom feed built from it. Both are committed
+# output: the feed has to be a real file at a stable URL for a reader to poll.
+CHANGELOG_FILE = os.path.join(DATA_DIR, "changelog.json")
+FEED_FILE = os.path.join(ROOT, "feed.xml")
+SITE_URL = "https://eastmanmd.github.io/scFM-tracker/"
+SITE_DOMAIN = "eastmanmd.github.io"        # for stable tag: URIs in the feed
+CHANGELOG_WEEKS = 52     # entries kept in data/changelog.json
+FEED_ENTRIES = 20        # weeks published in feed.xml
+CHANGELOG_MAX_PAPERS = 12   # new evaluations listed before the entry says "and N more"
+
+# A model whose score is unchanged can still swap places with a neighbour it is
+# a tenth of a point away from, week after week. Reporting that as news would
+# bury the weeks something actually happened, so a rank move has to clear both
+# thresholds to become an event.
+RANK_MOVE_MIN = 2        # places
+SCORE_MOVE_MIN = 0.5     # points
+CITATION_MILESTONES = (100, 250, 500, 1000, 2500, 5000, 10000)
+
 # One file per model, holding every citing article rather than the index's top N.
 CITING_DIR = os.path.join(DATA_DIR, "citations")

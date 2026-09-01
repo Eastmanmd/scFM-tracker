@@ -6,6 +6,7 @@ Writes:
   data/headtohead.json which models are jointly evaluated by the same benchmark paper
   data/citations/<id>.json  every citing article for one model, lazily fetched
   data/history.json    append-only weekly snapshot (drives week-over-week deltas)
+  data/changelog.json  append-only week-over-week diff, read by the site and feed.xml
   data/meta.json       provenance and corpus-level summary
 """
 import datetime
@@ -15,6 +16,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import changelog as changelog_mod
 import config
 
 PERMISSIVE = {"MIT", "APACHE-2.0", "BSD-2-CLAUSE", "BSD-3-CLAUSE", "ISC"}
@@ -134,6 +136,29 @@ def velocity(counts_by_year, this_year):
     return label, round(ratio, 2)
 
 
+def previous_first_seen(mid):
+    """When each citing record for one model was first seen by the tracker.
+
+    Read from the committed data/citations/<id>.json of the previous run --
+    the citing files are versioned output, so this survives a cold CI cache in
+    a way anything kept under cache/ would not.
+
+    Returns None when there is no previous file at all, which the caller reads
+    as "cannot tell what is new here" rather than "everything is new".
+    """
+    path = os.path.join(config.CITING_DIR, mid + ".json")
+    if not os.path.exists(path):
+        return None
+    try:
+        with open(path) as fh:
+            records = json.load(fh)
+    except ValueError:
+        return None
+    stamps = dict((r["id"], r["first_seen"]) for r in records
+                  if r.get("id") and r.get("first_seen"))
+    return stamps if stamps else None
+
+
 def head_to_head(citations_full, order):
     """Which models the field actually evaluates against each other.
 
@@ -244,6 +269,7 @@ def main():
         days=config.MOMENTUM_WINDOW_DAYS)).isoformat()
 
     rows = []
+    arrivals = []          # citing records first seen in this run, one per model hit
     citations_out = {}     # index: top N per model, loaded upfront
     citations_full = {}    # every citing article, one file per model
 
@@ -305,6 +331,22 @@ def main():
                  if k not in ("abstract", "topic_names", "has_abstract"))
             for rec in oa.get("citing", [])
         ]
+        # Stamp when the tracker first saw each record, carrying forward what
+        # the previous run knew. This is what makes "new this week" answerable:
+        # a 2024 paper OpenAlex indexed last Tuesday is new to the site now,
+        # and its publication date would file it under a week long past.
+        seen = previous_first_seen(mid)
+        for rec in full:
+            rec["first_seen"] = (seen or {}).get(rec["id"], today_iso)
+        if seen is not None:
+            # "Not in the previous run's file", not "stamped today". The two
+            # agree on every normal run and disagree exactly once: a rerun on
+            # the same day as the backfill, where every carried-forward record
+            # still reads as today's and the feed would announce the entire
+            # corpus. Comparing identities cannot drift with the calendar.
+            for rec in full:
+                if rec["id"] not in seen:
+                    arrivals.append(dict(rec, model=mid))
         # The whole list goes in the model's own file, fetched only when its
         # page is opened. The index keeps the most recent few, which is what
         # the leaderboard and the cross-model feed read on first load.
@@ -353,12 +395,20 @@ def main():
         row["rank"] = i
 
     # ---- append today's snapshot -------------------------------------------
+    # Everything the changelog compares week over week has to be in here: a
+    # field that is not snapshotted has no previous value to diff against, and
+    # rank, licence and upkeep are exactly the changes worth reporting.
     snapshot = {
         "date": today_iso,
         "models": dict((r["id"], {"citations": r["citations"],
                                   "stars": r["stars"],
                                   "downloads": r["downloads"],
-                                  "biology_share": r["biology_share"]})
+                                  "biology_share": r["biology_share"],
+                                  "rank": r["rank"],
+                                  "score": r["score"],
+                                  "license": r["license"],
+                                  "upkeep": r["upkeep"],
+                                  "benchmark": r["use_counts"].get("benchmark", 0)})
                        for r in rows),
     }
     snapshots = [s for s in snapshots if s["date"] != today_iso] + [snapshot]
@@ -374,9 +424,29 @@ def main():
     with open(os.path.join(config.DATA_DIR, "citations.json"), "w") as fh:
         json.dump(citations_out, fh)
 
+    h2h_path = os.path.join(config.DATA_DIR, "headtohead.json")
+    prev_h2h = load(h2h_path, None)      # read before it is overwritten below
     h2h = head_to_head(citations_full, [r["id"] for r in rows])
-    with open(os.path.join(config.DATA_DIR, "headtohead.json"), "w") as fh:
+    with open(h2h_path, "w") as fh:
         json.dump(h2h, fh)
+
+    # ---- what changed since the previous run --------------------------------
+    # One record per work, carrying every model it cites, so a benchmark
+    # sweeping up ten models is one line in the feed rather than ten.
+    by_work = {}
+    for rec in arrivals:
+        entry = by_work.setdefault(rec["id"], dict(rec, models=[]))
+        entry["models"].append(rec["model"])
+    new_records = sorted(by_work.values(),
+                         key=lambda r: (r.get("date") or ""), reverse=True)
+
+    existing_log = load(config.CHANGELOG_FILE, {"entries": []})
+    # The first run after this feature lands has no previous state to diff, so
+    # it publishes a baseline rather than announcing the entire corpus as new.
+    entry = changelog_mod.build(rows, previous, h2h, prev_h2h, new_records,
+                                today_iso, not existing_log.get("entries"))
+    with open(config.CHANGELOG_FILE, "w") as fh:
+        json.dump(changelog_mod.append(existing_log, entry), fh, indent=1)
 
     # One file per model. Stale files are removed rather than left behind: a
     # model dropped from the registry would otherwise keep serving a citing
@@ -430,6 +500,7 @@ def main():
             row["upkeep"], row["velocity"]))
     print("\nhead-to-head: {} benchmark papers, {} of them citing 2+ models".format(
         h2h["benchmark_papers"], h2h["comparison_papers"]))
+    print("changelog: {} event(s) for {}".format(len(entry["events"]), today_iso))
     print("\nmomentum basis: {}".format(momentum_basis))
     print("history depth: {} snapshot(s)".format(len(snapshots)))
 
