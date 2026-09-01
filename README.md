@@ -70,6 +70,34 @@ Two related data-quality rules:
   throttled request as a deleted repo would drop a model's stars to zero and
   quietly move it down the ranking.
 
+## Which models are evaluated against each other
+
+A citing paper labelled `benchmark` that cites two tracked models is an
+independent evaluation covering both. Intersecting the citing corpus on that
+label turns the field's own comparison record into a matrix — 81 of the 135
+benchmarking papers cite two or more tracked models:
+
+| Pair | Benchmarking papers citing both | Papers citing both, any use |
+|---|---:|---:|
+| scGPT · Geneformer | 56 | 658 |
+| scGPT · scFoundation | 49 | 494 |
+| Geneformer · scFoundation | 37 | 396 |
+| scGPT · scBERT | 27 | 375 |
+
+Clicking a cell lists the papers behind it, so "who has actually evaluated
+these two together" is one click rather than a literature search. It costs no
+extra API calls: the citing lists are already fetched and stored per model.
+
+Two things the matrix deliberately does not claim:
+
+- **It is co-citation by an evaluating paper, not a verified head-to-head
+  result.** The label belongs to the citing paper, so a paper that evaluates
+  one model and cites the other only in its introduction is counted.
+- **An empty cell is missing evidence, not a verdict.** CellHermes and LangCell
+  have no joint evaluation with anything on the list — which for models this
+  recent is the expected state, and reading it as a poor result would be
+  exactly backwards.
+
 ## How citing articles are classified
 
 Every citing paper carries two independent labels, assigned from its title,

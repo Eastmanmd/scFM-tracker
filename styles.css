@@ -275,5 +275,46 @@ tbody tr:hover { background: var(--wash); }
 .status-dormant, .status-archived { color: var(--critical); }
 .status-unknown { color: var(--muted); }
 
+/* ---- head-to-head matrix ----
+   Square cells on a 19x19 grid, so the column labels are turned on their side
+   rather than allowed to set the column width. */
+.matrix.h2h { border-collapse: separate; border-spacing: 2px; }
+.matrix.h2h th, .matrix.h2h td { border-bottom: 0; padding: 0; }
+.h2h-corner { width: 130px; vertical-align: bottom; text-align: right; padding-right: 6px !important; }
+.h2h-col { height: 96px; width: 30px; vertical-align: bottom; padding-bottom: 4px !important; }
+.h2h-col span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 500; }
+.h2h-row { width: 130px; min-width: 108px; text-align: right; padding-right: 8px !important; font-weight: 400; }
+/* scGPT, not SCGPT -- these labels are model names, so the table-wide
+   uppercase header treatment is undone on both axes. */
+.h2h-col, .h2h-row { text-transform: none; letter-spacing: 0; color: var(--ink-2); font-size: 12px; }
+.h2h-cell, .h2h-diag {
+  width: 30px; min-width: 30px; height: 30px; text-align: center; border-radius: 4px;
+  font-size: 11.5px; font-variant-numeric: tabular-nums; color: var(--ink-2);
+}
+/* An empty cell is outlined rather than filled, so "one paper" (the palest
+   band) still reads as data against "none at all" in both themes. */
+.h2h-cell { background: transparent; box-shadow: inset 0 0 0 1px var(--grid); cursor: pointer; }
+.h2h-cell.t1, .h2h-cell.t2, .h2h-cell.t3, .h2h-cell.t4 { box-shadow: none; }
+.h2h-cell:hover { outline: 2px solid var(--series-1); outline-offset: -2px; }
+.h2h-cell.sel { outline: 2px solid var(--ink); outline-offset: -2px; }
+.h2h-cell.t1 { background: var(--wash); }
+.h2h-cell.t2 { background: var(--seq-150); color: var(--ink); }
+.h2h-cell.t3 { background: var(--seq-250); color: var(--ink); }
+.h2h-cell.t4 { background: var(--seq-450); color: #fff; font-weight: 600; }
+.h2h-diag { background: transparent; color: var(--muted); border: 1px dashed var(--baseline); }
+.h2h-legend i.h2h-swatch { border-radius: 3px; width: 12px; height: 12px; box-shadow: inset 0 0 0 1px var(--border); }
+.h2h-swatch.t1 { background: var(--wash); }
+.h2h-swatch.t2 { background: var(--seq-150); }
+.h2h-swatch.t3 { background: var(--seq-250); }
+.h2h-swatch.t4 { background: var(--seq-450); }
+.h2h-tags .model-name { font-weight: 500; color: var(--ink-2); }
+
+.rivals { display: flex; flex-wrap: wrap; gap: 8px; }
+.rival {
+  display: flex; align-items: baseline; gap: 7px; padding: 5px 10px;
+  border: 1px solid var(--border); border-radius: 999px; background: var(--wash);
+}
+.rival-n { font-variant-numeric: tabular-nums; color: var(--ink-2); font-size: 12px; }
+
 .loading { color: var(--muted); padding: 30px 0; }
 .site-footer { color: var(--muted); font-size: 13px; padding: 24px 0 40px; border-top: 1px solid var(--border); margin-top: 30px; }

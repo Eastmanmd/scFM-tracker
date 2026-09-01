@@ -3,6 +3,7 @@
 Writes:
   data/models.json     one row per model: specs, metrics, score breakdown
   data/citations.json  index of recent citing articles per model, both axes
+  data/headtohead.json which models are jointly evaluated by the same benchmark paper
   data/citations/<id>.json  every citing article for one model, lazily fetched
   data/history.json    append-only weekly snapshot (drives week-over-week deltas)
   data/meta.json       provenance and corpus-level summary
@@ -131,6 +132,92 @@ def velocity(counts_by_year, this_year):
     else:
         label = "declining"
     return label, round(ratio, 2)
+
+
+def head_to_head(citations_full, order):
+    """Which models the field actually evaluates against each other.
+
+    A citing paper labelled "benchmark" that cites two tracked models is an
+    independent evaluation covering that pair. The label belongs to the citing
+    paper, not to the pairing -- classify.py reads only its title, abstract and
+    topics -- so it can never disagree between the two models, and the count is
+    symmetric.
+
+    Nothing here costs an API call: it is the citing corpus already on disk,
+    intersected. What it cannot see is which models a benchmark paper actually
+    put in the same table. A paper that evaluates one model and cites another
+    only in its introduction is counted, so the claim is co-citation by an
+    evaluating paper, not a verified head-to-head result. The page says so.
+
+    A zero cell means no such paper was found, which is an absence of evidence
+    about the pair -- not evidence that one of them lost.
+    """
+    models_by_work = {}
+    record_by_work = {}
+    tracked = set(order)
+    for mid, records in citations_full.items():
+        if mid not in tracked:
+            continue
+        for rec in records:
+            wid = rec.get("id")
+            if not wid:
+                continue
+            models_by_work.setdefault(wid, set()).add(mid)
+            record_by_work[wid] = rec
+
+    totals = dict((mid, {"bench": 0, "any": len(citations_full.get(mid, []))})
+                  for mid in order)
+    pairs = {}
+    papers = []
+
+    for wid, mids in models_by_work.items():
+        rec = record_by_work[wid]
+        is_bench = rec.get("use") == "benchmark"
+        mids = sorted(mids)
+        if is_bench:
+            for mid in mids:
+                totals[mid]["bench"] += 1
+        for i in range(len(mids)):
+            for j in range(i + 1, len(mids)):
+                cell = pairs.setdefault(mids[i] + "|" + mids[j],
+                                        {"bench": 0, "any": 0})
+                cell["any"] += 1
+                if is_bench:
+                    cell["bench"] += 1
+        if is_bench and len(mids) > 1:
+            papers.append({
+                "id": wid,
+                "title": rec.get("title"),
+                "doi": rec.get("doi"),
+                "venue": rec.get("venue"),
+                "date": rec.get("date"),
+                "year": rec.get("year"),
+                "cited_by_count": rec.get("cited_by_count"),
+                "first_author": rec.get("first_author"),
+                "n_authors": rec.get("n_authors"),
+                "models": mids,
+            })
+
+    # Newest first, matching every other article list on the site. Each paper
+    # is stored once with the models it covers rather than once per pair, so
+    # the file stays small however many models a benchmark sweeps up.
+    papers.sort(key=lambda p: (p.get("date") or ""), reverse=True)
+
+    # Pairs no benchmark paper covers are dropped: the matrix renders a blank
+    # cell for a missing key, and keeping 100+ zeroed entries only inflates the
+    # file. Pairs with co-citations but no benchmark paper are kept, because
+    # "cited together 658 times, never jointly evaluated" is the finding.
+    pairs = dict((k, v) for k, v in pairs.items() if v["bench"] or v["any"])
+
+    return {
+        "order": order,
+        "totals": totals,
+        "pairs": pairs,
+        "papers": papers,
+        "benchmark_papers": sum(1 for wid in models_by_work
+                                if record_by_work[wid].get("use") == "benchmark"),
+        "comparison_papers": len(papers),
+    }
 
 
 def main():
@@ -287,6 +374,10 @@ def main():
     with open(os.path.join(config.DATA_DIR, "citations.json"), "w") as fh:
         json.dump(citations_out, fh)
 
+    h2h = head_to_head(citations_full, [r["id"] for r in rows])
+    with open(os.path.join(config.DATA_DIR, "headtohead.json"), "w") as fh:
+        json.dump(h2h, fh)
+
     # One file per model. Stale files are removed rather than left behind: a
     # model dropped from the registry would otherwise keep serving a citing
     # list that nothing on the site can reach or refresh.
@@ -337,6 +428,8 @@ def main():
             row["rank"], row["name"][:19], row["score"], row["citations"],
             row["citations_12m"], row["stars"], row["downloads"],
             row["upkeep"], row["velocity"]))
+    print("\nhead-to-head: {} benchmark papers, {} of them citing 2+ models".format(
+        h2h["benchmark_papers"], h2h["comparison_papers"]))
     print("\nmomentum basis: {}".format(momentum_basis))
     print("history depth: {} snapshot(s)".format(len(snapshots)))
 

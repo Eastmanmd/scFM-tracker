@@ -1,7 +1,7 @@
 /* Single-Cell Foundation Model Tracker — reads data/*.json, renders everything
    client-side. No build step, no dependencies. */
 
-var DATA = {models: [], citations: {}, meta: {}, history: {snapshots: []}};
+var DATA = {models: [], citations: {}, meta: {}, history: {snapshots: []}, h2h: null};
 
 /* data/citations.json carries only the most recent few articles per model so the
    first paint stays small. A model's complete citing list lives in its own file
@@ -23,6 +23,7 @@ var weights = {attention: 0.35, momentum: 0.25, usage: 0.20, openness: 0.20};
 var sortKey = "score", sortDir = -1;
 var filters = {};
 var TASKS = ["annotation", "integration", "imputation", "perturbation", "grn", "spatial"];
+var h2hPair = null;   // "modelA|modelB" while a matrix cell is selected
 
 /* ---------- helpers ---------- */
 function el(id) { return document.getElementById(id); }
@@ -348,6 +349,8 @@ function renderDetail(id) {
     '<p class="sub">Deduped total is ' + num(mo.citations) + ", versus " +
     num(mo.citations_naive_sum) + " if versions were simply summed — the gap is papers citing more than one version.</p></div>" +
 
+    rivalPanel(mo) +
+
     '<div class="card"><h2>Who is citing it</h2>' + domainPanel(mo) +
     '<h2 style="margin-top:22px">How the ' + num(mo.citations) + " citing papers use it</h2>" +
     '<p class="sub">' + ["application", "benchmark", "extension", "review"].map(function (u) {
@@ -365,6 +368,41 @@ function renderDetail(id) {
   if (more) {
     more.onclick = function () { citingShown += CITING_PAGE; renderDetail(id); };
   }
+}
+
+/* Which models the same benchmarking papers evaluate alongside this one.
+   Ranked by how many such papers there are, which is the closest thing the
+   corpus has to "what the field compares this against". */
+function rivalPanel(mo) {
+  var h = DATA.h2h;
+  if (!h || !h.totals[mo.id]) return "";
+
+  var rivals = h.order.filter(function (id) { return id !== mo.id && modelById(id); })
+    .map(function (id) { return {id: id, cell: pairCell(pairKey(mo.id, id))}; })
+    .filter(function (r) { return r.cell.bench > 0; })
+    .sort(function (a, b) { return b.cell.bench - a.cell.bench; });
+
+  var own = h.totals[mo.id].bench;
+  if (!rivals.length) {
+    return '<div class="card"><h2>Benchmarked against</h2><p class="sub">No paper in the ' +
+      "corpus evaluates " + esc(shortName(mo.name)) + " alongside another tracked model" +
+      (own ? " — " + own + " benchmarking paper" + (own === 1 ? "" : "s") + " cite" +
+        (own === 1 ? "s" : "") + " it on its own." : " yet.") +
+      " That is missing evidence rather than a poor result; models published recently " +
+      "sit here until the first independent evaluation lands.</p></div>";
+  }
+
+  return '<div class="card"><h2>Benchmarked against</h2>' +
+    '<p class="sub">Papers that evaluate rather than apply, and cite both models. ' +
+    own + " benchmarking paper" + (own === 1 ? "" : "s") + " cite " +
+    esc(shortName(mo.name)) + " in total.</p>" +
+    '<div class="rivals">' + rivals.slice(0, 8).map(function (r) {
+      return '<div class="rival"><span class="model-name" data-model="' + r.id + '">' +
+        esc(h2hName(r.id)) + '</span><span class="rival-n">' + r.cell.bench + "</span></div>";
+    }).join("") + "</div>" +
+    (rivals.length > 8 ? '<p class="sub">' + (rivals.length - 8) +
+      " further pairing(s) with fewer papers — see the head-to-head matrix.</p>" : "") +
+    "</div>";
 }
 
 /* The method/biology split, with the abstentions kept visible. Hiding
@@ -608,6 +646,16 @@ function renderMatrix() {
 
 /* ---------- hover card ---------- */
 document.addEventListener("mouseover", function (e) {
+  var key = e.target.dataset && e.target.dataset.pair;
+  if (key) {
+    var parts = key.split("|"), cell = pairCell(key), tipEl = el("tooltip");
+    tipEl.innerHTML = "<b>" + esc(h2hName(parts[0])) + " vs " + esc(h2hName(parts[1])) + "</b>" +
+      '<div class="row"><span>benchmarking papers citing both</span><span>' + cell.bench + "</span></div>" +
+      '<div class="row"><span>papers citing both, any use</span><span>' + num(cell.any) + "</span></div>" +
+      '<div class="sub">' + (cell.bench ? "Click to read them." : "Cited together, never jointly evaluated.") + "</div>";
+    tipEl.hidden = false;
+    return;
+  }
   var id = e.target.dataset && e.target.dataset.dot;
   if (!id) return;
   var mo = DATA.models.filter(function (m) { return m.id === id; })[0];
@@ -633,8 +681,139 @@ document.addEventListener("mousemove", function (e) {
   tip.style.top = y + "px";
 });
 document.addEventListener("mouseout", function (e) {
-  if (e.target.dataset && e.target.dataset.dot) el("tooltip").hidden = true;
+  var d = e.target.dataset;
+  if (d && (d.dot || d.pair)) el("tooltip").hidden = true;
 });
+
+/* ---------- head-to-head: who gets evaluated against whom ----------
+   A citing paper labelled "benchmark" that cites two tracked models is an
+   independent evaluation covering both. The label is a property of the citing
+   paper, so it is the same for every model that paper cites and the matrix is
+   symmetric by construction. What it cannot know is which models a benchmark
+   actually put in the same table; that limitation is stated on the page rather
+   than left for the reader to assume away. */
+
+function modelById(id) {
+  return DATA.models.filter(function (m) { return m.id === id; })[0];
+}
+function h2hName(id) {
+  var mo = modelById(id);
+  return mo ? shortName(mo.name) : id;
+}
+function pairKey(a, b) { return a < b ? a + "|" + b : b + "|" + a; }
+function pairCell(key) {
+  return (DATA.h2h && DATA.h2h.pairs[key]) || {bench: 0, any: 0};
+}
+/* Four bands rather than a continuous ramp: the counts span 1 to 56, and a
+   smooth scale would render most of the matrix as indistinguishable pale blue
+   while making the numbers in the dark cells unreadable. */
+function h2hTier(n) {
+  if (!n) return 0;
+  if (n < 5) return 1;
+  if (n < 15) return 2;
+  if (n < 30) return 3;
+  return 4;
+}
+
+function renderH2H() {
+  var h = DATA.h2h;
+  if (!h) {
+    el("view-h2h").innerHTML =
+      '<div class="card"><h2>Head-to-head</h2><p class="sub">This view reads ' +
+      "data/headtohead.json, which this deployment does not carry yet — it is " +
+      "written by the next weekly refresh.</p></div>";
+    return;
+  }
+
+  var ids = h.order.filter(modelById);
+  var never = ids.filter(function (id) {
+    return ids.every(function (other) {
+      return other === id || !pairCell(pairKey(id, other)).bench;
+    });
+  });
+
+  var head = '<th class="h2h-corner"><span class="sub">evaluated with →</span></th>' +
+    ids.map(function (id) {
+      return '<th class="h2h-col"><span>' + esc(h2hName(id)) + "</span></th>";
+    }).join("");
+
+  var body = ids.map(function (r) {
+    return '<tr><th class="h2h-row"><span class="model-name" data-model="' + r +
+      '">' + esc(h2hName(r)) + "</span></th>" +
+      ids.map(function (c) {
+        if (r === c) {
+          var t = h.totals[r] || {bench: 0};
+          return '<td class="h2h-diag"><span title="' + esc(h2hName(r)) + ": " +
+            t.bench + ' benchmarking papers cite it at all">' + (t.bench || "—") +
+            "</span></td>";
+        }
+        var key = pairKey(r, c), cell = pairCell(key);
+        return '<td class="h2h-cell t' + h2hTier(cell.bench) +
+          (h2hPair === key ? " sel" : "") + '" data-pair="' + key + '">' +
+          (cell.bench || "") + "</td>";
+      }).join("") + "</tr>";
+  }).join("");
+
+  var selected = h.papers;
+  var caption = "All " + h.papers.length + " benchmarking papers that cite two or more tracked models";
+  if (h2hPair) {
+    var pm = h2hPair.split("|");
+    selected = h.papers.filter(function (p) {
+      return p.models.indexOf(pm[0]) >= 0 && p.models.indexOf(pm[1]) >= 0;
+    });
+    caption = h2hName(pm[0]) + " vs " + h2hName(pm[1]) + " — " + selected.length +
+      " benchmarking paper" + (selected.length === 1 ? "" : "s") + " citing both, of " +
+      num(pairCell(h2hPair).any) + " papers that cite both for any reason";
+  }
+
+  el("view-h2h").innerHTML =
+    '<div class="card"><h2>Which models are actually evaluated against each other</h2>' +
+    '<p class="sub">Each cell counts the papers that <em>benchmark</em> — evaluate or compare ' +
+    "rather than apply — and cite both models. That is the field's own comparison record: " +
+    h.comparison_papers + " of the " + h.benchmark_papers + " benchmarking papers in the corpus " +
+    "cite two or more tracked models. The diagonal is how many benchmarking papers cite that " +
+    "model at all. Click a cell to read the papers behind it.</p>" +
+    '<div class="chart-legend h2h-legend">' +
+    [["t1", "1–4 papers"], ["t2", "5–14"], ["t3", "15–29"], ["t4", "30+"]].map(function (b) {
+      return '<span><i class="h2h-swatch ' + b[0] + '"></i>' + b[1] + "</span>";
+    }).join("") + "</div>" +
+    '<div class="table-scroll"><table class="matrix h2h"><thead><tr>' + head +
+    "</tr></thead><tbody>" + body + "</tbody></table></div>" +
+    '<p class="sub"><strong>A blank cell is missing evidence, not a verdict.</strong> It means no ' +
+    "paper in the corpus evaluated the two together — which for a model published this year is " +
+    "the expected state, not a mark against it." +
+    (never.length ? " " + never.map(function (id) { return esc(h2hName(id)); }).join(", ") +
+      " ha" + (never.length === 1 ? "s" : "ve") + " not yet been jointly evaluated with anything " +
+      "on this list." : "") + "</p>" +
+    '<p class="sub">The label belongs to the citing paper, not to the pair: this counts ' +
+    "benchmarking papers that cite both models, which is not proof the two appeared in the same " +
+    "table. A paper that evaluates one and cites the other only in its introduction is counted " +
+    "here. Labels come from a rules-based classifier — 89% accurate on 92 hand-checked papers — " +
+    "so treat a difference of one or two papers as noise.</p></div>" +
+
+    '<div class="card"><h2>' + esc(caption) + "</h2>" +
+    (h2hPair ? '<button class="chip on" id="h2h-clear">← every comparison paper</button>' : "") +
+    (selected.length ? selected.map(h2hPaperRow).join("")
+      : '<p class="sub">No benchmarking paper in the corpus cites both.</p>') +
+    "</div>";
+
+  var clear = el("h2h-clear");
+  if (clear) clear.onclick = function () { h2hPair = null; renderH2H(); };
+}
+
+function h2hPaperRow(p) {
+  return '<div class="art"><div class="t">' +
+    (p.doi ? '<a href="' + esc(p.doi) + '" rel="noopener">' + esc(p.title) + "</a>"
+           : esc(p.title)) +
+    '</div><div class="m">' + esc(p.first_author || "—") +
+    (p.n_authors > 1 ? " et al." : "") + " · " + esc(p.venue || "unlisted") +
+    " · " + (p.date || p.year || "") + " · cited " + num(p.cited_by_count || 0) +
+    "×</div>" +
+    '<div class="m h2h-tags">covers ' + p.models.map(function (id) {
+      return '<span class="model-name" data-model="' + id + '">' + esc(h2hName(id)) +
+        "</span>";
+    }).join(", ") + "</div></div>";
+}
 
 /* ---------- citing-articles feed ---------- */
 function renderCitations() {
@@ -723,6 +902,18 @@ function renderAbout() {
     "<p class='sub'>The larger caveat: this classifies the citing <em>paper</em>, not the " +
     "citation. Separating a paper that ran the model from one that name-checked it in the " +
     "introduction needs full text, which OpenAlex does not carry.</p></div>" +
+    '<div class="card"><h2>The comparison record</h2>' +
+    (DATA.h2h
+      ? "<p>Of the " + DATA.h2h.benchmark_papers + " papers labelled <strong>benchmark</strong>, " +
+        DATA.h2h.comparison_papers + " cite two or more tracked models. Those are the field " +
+        "evaluating its own models against each other, and the head-to-head matrix is that " +
+        "record as a grid.</p>" +
+        "<p class='sub'>It is built by intersecting the citing corpus already on disk — no " +
+        "extra requests — so it inherits every limit of the labels above. A cell counts " +
+        "benchmarking papers citing both models; it cannot know whether the two appeared in " +
+        "the same table. An empty cell means no such paper was found, which for a model " +
+        "published this year is the expected state rather than a poor result.</p>"
+      : "<p class='sub'>Not available on this deployment.</p>") + "</div>" +
     '<div class="card"><h2>Data sources</h2><p class="sub">' +
     (m.sources || []).join(" · ") + ". Updated " + m.updated + ", from " + m.history_depth +
     " weekly snapshot(s).</p></div>";
@@ -730,7 +921,7 @@ function renderAbout() {
 
 /* ---------- routing ---------- */
 function show(view, arg) {
-  ["models", "landscape", "matrix", "citations", "about", "detail"].forEach(function (v) {
+  ["models", "landscape", "matrix", "h2h", "citations", "about", "detail"].forEach(function (v) {
     el("view-" + v).hidden = v !== view;
   });
   Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
@@ -741,6 +932,7 @@ function show(view, arg) {
   if (view === "models") renderModels();
   if (view === "landscape") renderLandscape();
   if (view === "matrix") renderMatrix();
+  if (view === "h2h") renderH2H();
   if (view === "citations") renderCitations();
   if (view === "about") renderAbout();
   if (view === "detail") {
@@ -759,6 +951,13 @@ document.addEventListener("click", function (e) {
     return;
   }
   if (t.dataset.f) { filters[t.dataset.f] = !filters[t.dataset.f]; renderModels(); return; }
+  if (t.dataset.pair) {
+    // Clicking the selected cell again clears it rather than doing nothing.
+    h2hPair = h2hPair === t.dataset.pair ? null : t.dataset.pair;
+    el("tooltip").hidden = true;
+    renderH2H();
+    return;
+  }
   if (t.dataset.use) { filters.use = t.dataset.use; renderCitations(); return; }
   if (t.dataset.domain) { filters.domain = t.dataset.domain; renderCitations(); return; }
   if (t.dataset.sort) {
@@ -799,11 +998,18 @@ initTheme();
 
 Promise.all(["models", "citations", "meta", "history"].map(function (f) {
   return fetch("data/" + f + ".json").then(function (r) { return r.json(); });
-})).then(function (res) {
+}).concat([
+  // The only non-critical load. A deployment that predates the head-to-head
+  // file should still render everything else rather than fail to paint.
+  fetch("data/headtohead.json")
+    .then(function (r) { return r.ok ? r.json() : null; })
+    .catch(function () { return null; })
+])).then(function (res) {
   DATA.models = res[0].models;
   DATA.citations = res[1];
   DATA.meta = res[2];
   DATA.history = res[3];
+  DATA.h2h = res[4];
   if (DATA.meta.weights) {
     WEIGHT_KEYS.forEach(function (k) { weights[k] = DATA.meta.weights[k]; });
   }
