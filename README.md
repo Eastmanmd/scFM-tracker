@@ -15,20 +15,68 @@ Data refreshes weekly from OpenAlex, the GitHub API, and the Hugging Face Hub.
 Citation count alone rewards age. scBERT has 629 citations and has not had a
 commit since December 2023; scPRINT has 45 citations and was updated last week.
 Ranking either one above the other on citations alone tells you nothing about
-whether you should run it. So each model gets a 0–100 score from four
-normalized components:
+whether you should run it. So each model gets a 0–100 score from five
+components:
 
-> **score = 100 × (0.35·attention + 0.25·momentum + 0.20·usage + 0.20·openness)**
+> **score = 100 × (0.35·attention + 0.25·momentum + 0.20·usage + 0.10·openness + 0.10·runnability)**
 
 | Component | What it measures |
 |---|---|
 | **Attention** (×0.35) | Log-scaled total citations, deduplicated across every version of the model paper |
 | **Momentum** (×0.25) | Citations gained in the last 365 days, counted from the publication date on each citing paper |
 | **Usage** (×0.20) | Hugging Face downloads plus GitHub stars — did anyone pull the weights, not just cite the paper |
-| **Openness & upkeep** (×0.20) | Open weights, license permissiveness, and days since the last commit |
+| **Openness & upkeep** (×0.10) | Open weights, license permissiveness, and days since the last commit |
+| **Runnability** (×0.10) | Packaged, pinned, released, documented, and answered — see below |
+
+Runnability's weight came out of openness rather than out of the citation
+components: both answer "can I use this", so the practical-usability half of
+the score still totals 0.20, and attention, momentum and usage are weighted
+exactly as they always were.
 
 Sliders on the leaderboard re-weight everything live and write the weighting
 into the URL, so a particular ranking is a shareable link (`…/#w=0.35,0.25,0.20,0.20`).
+
+## Can you actually run it?
+
+Citations say the field noticed a model. Stars say people bookmarked it. The
+last-commit date says someone still touches the code. None of them answer what
+you ask before spending an afternoon on one of these — so five signals do:
+
+| Signal | Weight | Read from |
+|---|---:|---|
+| **installable** | 0.25 | a PyPI package whose metadata links back to this model's repo |
+| **env** | 0.20 | requirements.txt / environment.yml / pyproject.toml / Dockerfile |
+| **release** | 0.15 | a tagged GitHub release, or a tagged Hugging Face revision |
+| **tutorials** | 0.15 | notebooks shipped with the code (3 earns full marks) |
+| **responsive** | 0.25 | an issue or discussion resolved in the last 90 days |
+
+Every signal is read from **both** GitHub and Hugging Face and merged. That is
+not a detail: Geneformer ships no GitHub repository, and an earlier
+GitHub-only version left it unmeasured — which, under the renormalizing scorer
+below, quietly moved it to #1 for having nothing to fail at. Measured properly
+on its Hugging Face repo (8 notebooks, a requirements.txt, discussions answered
+this quarter, no PyPI package, no tags) it scores 60, and scGPT keeps the top
+spot. Only tGPT, published on neither host, goes unmeasured.
+
+**A package counts only when it links back to the model's own repository.**
+Name matching alone is how a model gets credited with someone else's release:
+PyPI's `uce` belongs to `lmrck/dnb`, `scfoundation` to a different author's
+`scFoundationModels`, and `scbert` to an unrelated `SCBert`. All three are
+correctly rejected. The cost is the opposite error — scPRINT publishes from its
+author's personal namespace and `arc-state` ships no URLs at all — so those two
+are named by hand in `registry.json` rather than guessed.
+
+**A signal that could not be read is dropped, never failed.** The remaining
+weights are renormalized, so a throttled request never quietly reads as "no
+notebooks, no releases, no answers". The same rule applies one level up: a
+model missing a whole component is scored on the components it has, and its
+model page says so rather than showing a zero bar.
+
+Two things this does not claim. Runnability is not quality — a research repo
+with no package can still be the right thing to read. And "issues answered" is
+binary on purpose: that somebody replied this quarter is supportable, while
+ranking seven closed issues above two mostly measures how much traffic a repo
+gets.
 
 ## Momentum is counted, not inferred
 

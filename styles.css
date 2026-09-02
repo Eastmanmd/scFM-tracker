@@ -316,6 +316,14 @@ tbody tr:hover { background: var(--wash); }
 }
 .rival-n { font-variant-numeric: tabular-nums; color: var(--ink-2); font-size: 12px; }
 
+/* ---- runnability signals ---- */
+.sigs { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 2px 18px; }
+.sig { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--grid); font-size: 14px; }
+.sig-yes { color: var(--good-text); font-weight: 600; }
+.sig-no { color: var(--muted); }
+.sig-part { color: var(--warn-text); font-weight: 600; }
+.sig-unknown { color: var(--muted); font-style: italic; }
+
 /* ---- what-changed card ---- */
 .log-card .log-week + .log-week { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--grid); }
 .log-date { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 8px; }

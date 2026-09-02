@@ -12,14 +12,20 @@ var DATA = {models: [], citations: {}, meta: {}, history: {snapshots: []}, h2h: 
 var citingFull = {};
 var CITING_PAGE = 100;   // rows revealed per "show more" click
 var citingShown = CITING_PAGE;
-var WEIGHT_KEYS = ["attention", "momentum", "usage", "openness"];
+var WEIGHT_KEYS = ["attention", "momentum", "usage", "openness", "runnable"];
+/* The four keys a shared link used before runnability existed. Such a link is
+   honoured with runnability at zero, so the ranking someone shared still ranks
+   the way it did when they shared it. */
+var LEGACY_WEIGHT_KEYS = ["attention", "momentum", "usage", "openness"];
 var WEIGHT_LABELS = {
   attention: "Attention (citations)",
   momentum: "Momentum (recent gain)",
   usage: "Usage (downloads + stars)",
-  openness: "Openness & upkeep"
+  openness: "Openness & upkeep",
+  runnable: "Runnability (install & support)"
 };
-var weights = {attention: 0.35, momentum: 0.25, usage: 0.20, openness: 0.20};
+var weights = {attention: 0.35, momentum: 0.25, usage: 0.20, openness: 0.10,
+               runnable: 0.10};
 var sortKey = "score", sortDir = -1;
 var filters = {};
 var TASKS = ["annotation", "integration", "imputation", "perturbation", "grn", "spatial"];
@@ -45,10 +51,14 @@ function compact(n) {
 /* Re-score client-side so the sliders are instant. Mirrors build_data.py:
    components are precomputed and normalized; only the weighting changes here. */
 function rescore(model) {
-  var total = WEIGHT_KEYS.reduce(function (s, k) { return s + weights[k]; }, 0) || 1;
-  return WEIGHT_KEYS.reduce(function (s, k) {
-    return s + (model.components[k] || 0) * (weights[k] / total);
-  }, 0) * 100;
+  // Mirrors build_data.py: a component with no data for this model is dropped
+  // and the remaining weights renormalized, rather than counted as a zero.
+  var known = WEIGHT_KEYS.filter(function (k) { return model.components[k] != null; });
+  var total = known.reduce(function (s, k) { return s + weights[k]; }, 0);
+  if (!total) return 0;
+  return known.reduce(function (s, k) {
+    return s + model.components[k] * weights[k];
+  }, 0) / total * 100;
 }
 
 function sparkline(counts, width, height) {
@@ -267,7 +277,8 @@ function renderModels() {
     ["citations", "Citations", "num"], ["", "Trend", ""],
     ["biology_share", "Biology", "num"],
     ["downloads", "HF 30d", "num"], ["stars", "Stars", "num"],
-    ["days_since_push", "Upkeep", ""], ["params", "Params", "num"],
+    ["days_since_push", "Upkeep", ""], ["runnable", "Runnable", "num"],
+    ["params", "Params", "num"],
     ["cells", "Cells", "num"], ["", "Tasks", ""], ["license", "License", ""]
   ];
 
@@ -306,6 +317,7 @@ function renderModels() {
         '<td><span class="badge ' + mo.upkeep + '">' + mo.upkeep + "</span>" +
         (mo.days_since_push != null ? '<div class="model-org">' + mo.days_since_push + "d ago</div>" : "") +
         "</td>" +
+        '<td class="num">' + runnableCell(mo) + "</td>" +
         '<td class="num">' + compact(mo.params) + "</td>" +
         '<td class="num">' + compact(mo.cells) + "</td>" +
         '<td><div class="tasks">' + mo.tasks.map(function (t) {
@@ -329,6 +341,64 @@ function bindChangelogButtons() {
   var more = el("log-more"), less = el("log-less");
   if (more) more.onclick = function () { logWeeks += 4; renderModels(); };
   if (less) less.onclick = function () { logWeeks = 1; renderModels(); };
+}
+
+/* ---------- runnability ----------
+   Citations say the field noticed a model; this says whether you could install
+   it this afternoon. The signals are deliberately boring and checkable: a
+   package, a pinned environment, a tagged release, worked examples, and
+   somebody closing issues. */
+
+var RUNNABLE_SIGNALS = [
+  ["installable", "on PyPI"],
+  ["env", "pinned environment"],
+  ["release", "tagged release"],
+  ["tutorials", "worked examples"],
+  ["responsive", "issues answered (90d)"]
+];
+
+function runnableCell(mo) {
+  if (mo.runnable == null) return '<span class="sub" title="No repository to inspect">—</span>';
+  return Math.round(mo.runnable * 100);
+}
+
+function runnablePanel(mo) {
+  var d = mo.runnable_detail;
+  if (!d) {
+    return '<div class="card"><h2>Can you run it?</h2><p class="sub">' +
+      esc(shortName(mo.name)) + " publishes neither a GitHub repository nor Hugging " +
+      "Face weights, so none of these signals can be read for it. It is scored on the " +
+      "four components that can be measured rather than carrying a zero here.</p></div>";
+  }
+  var facts = [];
+  if (d.pypi) facts.push("<code>pip install " + esc(d.pypi) + "</code>");
+  if (d.release) facts.push("latest release <strong>" + esc(d.release) + "</strong>");
+  if (d.env_files && d.env_files.length) facts.push(esc(d.env_files.join(", ")));
+  if (d.dockerfile) facts.push("Dockerfile");
+  if (d.notebooks) facts.push(d.notebooks + " notebook" + (d.notebooks === 1 ? "" : "s"));
+  if (d.closed_issues_90d != null) {
+    facts.push(d.closed_issues_90d + " issue" + (d.closed_issues_90d === 1 ? "" : "s") +
+      " closed in 90 days");
+  }
+
+  var rows = RUNNABLE_SIGNALS.map(function (sig) {
+    var v = d.signals[sig[0]];
+    var mark = v == null ? '<span class="sig-unknown">not measured</span>'
+      : v >= 1 ? '<span class="sig-yes">yes</span>'
+      : v > 0 ? '<span class="sig-part">' + Math.round(v * 100) + "%</span>"
+      : '<span class="sig-no">no</span>';
+    return '<div class="sig"><span>' + esc(sig[1]) + "</span>" + mark + "</div>";
+  }).join("");
+
+  return '<div class="card"><h2>Can you run it?</h2>' +
+    '<p class="sub">Scored <strong>' + Math.round(mo.runnable * 100) + "/100</strong>" +
+    (d.observed_weight < 1
+      ? " on the " + Math.round(d.observed_weight * 100) + "% of signals that could be read"
+      : "") + ". " + (facts.length ? facts.join(" · ") : "None of these are present.") + "</p>" +
+    '<div class="sigs">' + rows + "</div>" +
+    '<p class="sub">A closed issue in the last 90 days is the cheapest evidence that ' +
+    "somebody is still answering. None of this judges the model — a research repo with " +
+    "no package can still be the right one to read.</p></div>";
 }
 
 function bioShareCell(mo) {
@@ -401,13 +471,20 @@ function renderDetail(id) {
 
     '<div class="card"><h2>Score breakdown</h2>' +
     WEIGHT_KEYS.map(function (k) {
-      var v = mo.components[k] || 0;
+      var v = mo.components[k];
+      if (v == null) {
+        return '<div style="margin-bottom:8px"><div class="sub">' + WEIGHT_LABELS[k] +
+          " — not measurable for this model, so it is left out of the score rather " +
+          "than counted as zero</div></div>";
+      }
       return '<div style="margin-bottom:8px"><div class="sub">' + WEIGHT_LABELS[k] +
         " — " + (v * 100).toFixed(0) + "%</div>" +
         '<div style="height:7px;background:var(--grid);border-radius:4px">' +
         '<div style="height:7px;width:' + (v * 100).toFixed(0) +
         '%;background:var(--seq-450);border-radius:4px"></div></div></div>';
     }).join("") + "</div>" +
+
+    runnablePanel(mo) +
 
     '<div class="card"><h2>Papers</h2>' + mo.papers.map(function (p) {
       return '<div class="art"><div class="t">' + esc(p.title) + "</div>" +
@@ -938,7 +1015,7 @@ function renderAbout() {
   var m = DATA.meta;
   el("about-dynamic").innerHTML =
     '<div class="card"><h2>How the score works</h2>' +
-    "<p>Each model is scored 0–100 from four normalized components, weighted by default as " +
+    "<p>Each model is scored 0–100 from five components, weighted by default as " +
     WEIGHT_KEYS.map(function (k) {
       return Math.round((m.weights ? m.weights[k] : weights[k]) * 100) + "% " + WEIGHT_LABELS[k].toLowerCase();
     }).join(", ") + ". The leaderboard sliders re-weight everything live.</p>" +
@@ -983,6 +1060,21 @@ function renderAbout() {
         "the same table. An empty cell means no such paper was found, which for a model " +
         "published this year is the expected state rather than a poor result.</p>"
       : "<p class='sub'>Not available on this deployment.</p>") + "</div>" +
+    '<div class="card"><h2>Runnability</h2>' +
+    "<p>The fifth component asks what the other four cannot: could you install " +
+    "this and get it running today. Five signals — a PyPI package, a pinned " +
+    "environment, a tagged release, worked examples, and an issue or discussion " +
+    "resolved in the last 90 days — read from GitHub and Hugging Face and merged, " +
+    "so a model is asked the same questions wherever its code lives.</p>" +
+    "<p class='sub'>A package counts only when its metadata links back to the " +
+    "model's own repository. PyPI's <code>uce</code>, <code>scfoundation</code> and " +
+    "<code>scbert</code> all belong to unrelated projects, and name matching alone " +
+    "would have credited three models with someone else's release. The two packages " +
+    "that publish no link — scPRINT and arc-state — are named in the registry by hand.</p>" +
+    "<p class='sub'>A signal that could not be read is dropped and the rest " +
+    "renormalized, never counted as a failure. The weight came out of openness " +
+    "rather than out of the citation components, so attention, momentum and usage " +
+    "are weighted exactly as before.</p></div>" +
     '<div class="card"><h2>What changed, and the feed</h2>' +
     "<p>Every refresh is diffed against the one before it and written to " +
     "<code>data/changelog.json</code>, which the card on the leaderboard and " +
@@ -1071,8 +1163,12 @@ function readHash() {
   var m = /#w=([\d.,]+)/.exec(location.hash);
   if (!m) return;
   var parts = m[1].split(",").map(Number);
-  if (parts.length === WEIGHT_KEYS.length && parts.every(function (n) { return !isNaN(n); })) {
+  if (!parts.every(function (n) { return !isNaN(n); })) return;
+  if (parts.length === WEIGHT_KEYS.length) {
     WEIGHT_KEYS.forEach(function (k, i) { weights[k] = parts[i]; });
+  } else if (parts.length === LEGACY_WEIGHT_KEYS.length) {
+    LEGACY_WEIGHT_KEYS.forEach(function (k, i) { weights[k] = parts[i]; });
+    weights.runnable = 0;
   }
 }
 

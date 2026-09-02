@@ -94,6 +94,51 @@ def upkeep_score(gh, hfd, today):
     return 0.2, days, "dormant"
 
 
+def runnable_score(rd):
+    """How practical the model is to actually run, 0-1.
+
+    Scored only on the signals fetch_runnable.py could observe, with the
+    remaining weights renormalized. A signal that could not be read is dropped
+    rather than failed, so a throttled request never quietly reads as "no
+    notebooks, no releases" -- the same reasoning as upkeep_score's Hugging
+    Face fallback.
+
+    Returns (value, detail); value is None only when nothing at all was
+    observable, which now means a model published on neither GitHub nor
+    Hugging Face.
+    """
+    if not rd:
+        return None, None
+    signals = rd.get("signals") or {}
+    seen = {}
+    for key in ("installable", "env", "release", "responsive"):
+        if signals.get(key) is not None:
+            seen[key] = 1.0 if signals[key] else 0.0
+    if signals.get("tutorials") is not None:
+        seen["tutorials"] = min(
+            1.0, signals["tutorials"] / float(config.TUTORIALS_FULL_CREDIT))
+
+    if not seen:
+        return None, None
+    observed = sum(config.RUNNABLE_WEIGHTS[k] for k in seen)
+    value = sum(config.RUNNABLE_WEIGHTS[k] * v for k, v in seen.items()) / observed
+    detail = {
+        "signals": dict((k, round(v, 3)) for k, v in seen.items()),
+        "observed_weight": round(observed, 3),
+        "sources": rd.get("sources") or [],
+        "pypi": rd.get("pypi"),
+        "pypi_version": rd.get("pypi_version"),
+        "release": rd.get("release") or rd.get("hf_tag"),
+        "env_files": sorted(set((rd.get("env_files") or []) +
+                                (rd.get("hf_env_files") or []))) or None,
+        "dockerfile": rd.get("dockerfile"),
+        "notebooks": signals.get("tutorials"),
+        "closed_issues_90d": rd.get("closed_issues_90d"),
+        "hf_resolved_90d": rd.get("hf_resolved_90d"),
+    }
+    return round(value, 4), detail
+
+
 def trailing_citations(records, window_start):
     """Citing papers published on or after window_start.
 
@@ -250,6 +295,7 @@ def main():
     openalex = load(config.OPENALEX_FILE)
     github = load(config.GITHUB_FILE)
     hf = load(config.HF_FILE)
+    runnable_cache = load(config.RUNNABLE_FILE)
     history = load(config.HISTORY_FILE, {"snapshots": []})
 
     today = datetime.date.today()
@@ -284,6 +330,7 @@ def main():
         stars = gh.get("stars", 0) if gh else 0
         downloads = hfd.get("downloads", 0) if hfd else 0
         upkeep, days_since_push, upkeep_label = upkeep_score(gh, hfd, today)
+        runnable, runnable_detail = runnable_score(runnable_cache.get(mid))
         vel_label, vel_ratio = velocity(counts_by_year, this_year)
 
         prev_row = (previous or {}).get("models", {}).get(mid, {})
@@ -316,6 +363,8 @@ def main():
             "upkeep": upkeep_label,
             "days_since_push": days_since_push,
             "hf": hfd,
+            "runnable": runnable,
+            "runnable_detail": runnable_detail,
             "downloads": downloads,
             "citations_delta": (citations - prev_row["citations"]
                                 if "citations" in prev_row else None),
@@ -385,9 +434,19 @@ def main():
             "momentum": momentum.get(row["id"], 0.0),
             "usage": usage.get(row["id"], 0.0),
             "openness": openness.get(row["id"], 0.0),
+            "runnable": row["runnable"],
         }
-        row["components"] = dict((k, round(v, 4)) for k, v in parts.items())
-        row["score"] = round(100 * sum(parts[k] * weights[k] for k in weights), 1)
+        # A component with no data is dropped and the rest are renormalized, so
+        # a model distributed without a repository is scored on what can be
+        # measured for it instead of carrying a zero for a question nobody
+        # asked it. With every component present this is the plain weighted
+        # sum it has always been.
+        known = dict((k, v) for k, v in parts.items() if v is not None)
+        observed = sum(weights[k] for k in known) or 1.0
+        row["components"] = dict((k, round(v, 4)) for k, v in known.items())
+        row["components_missing"] = sorted(k for k in weights if k not in known)
+        row["score"] = round(
+            100 * sum(known[k] * weights[k] for k in known) / observed, 1)
         del row["_upkeep_raw"]
 
     rows.sort(key=lambda r: r["score"], reverse=True)
@@ -408,7 +467,8 @@ def main():
                                   "score": r["score"],
                                   "license": r["license"],
                                   "upkeep": r["upkeep"],
-                                  "benchmark": r["use_counts"].get("benchmark", 0)})
+                                  "benchmark": r["use_counts"].get("benchmark", 0),
+                                  "runnable": r["runnable"]})
                        for r in rows),
     }
     snapshots = [s for s in snapshots if s["date"] != today_iso] + [snapshot]
@@ -491,12 +551,13 @@ def main():
     with open(os.path.join(config.DATA_DIR, "meta.json"), "w") as fh:
         json.dump(meta, fh, indent=1)
 
-    print("{:<4}{:<20}{:>7}{:>8}{:>7}{:>9}{:>8}  {}".format(
-        "#", "model", "score", "cites", "12mo", "stars", "dl/30d", "upkeep"))
+    print("{:<4}{:<20}{:>7}{:>8}{:>7}{:>9}{:>8}{:>7}  {}".format(
+        "#", "model", "score", "cites", "12mo", "stars", "dl/30d", "run", "upkeep"))
     for row in rows:
-        print("{:<4}{:<20}{:>7}{:>8}{:>7}{:>9}{:>8}  {} / {}".format(
+        print("{:<4}{:<20}{:>7}{:>8}{:>7}{:>9}{:>8}{:>7}  {} / {}".format(
             row["rank"], row["name"][:19], row["score"], row["citations"],
             row["citations_12m"], row["stars"], row["downloads"],
+            "-" if row["runnable"] is None else int(round(row["runnable"] * 100)),
             row["upkeep"], row["velocity"]))
     print("\nhead-to-head: {} benchmark papers, {} of them citing 2+ models".format(
         h2h["benchmark_papers"], h2h["comparison_papers"]))

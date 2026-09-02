@@ -10,6 +10,7 @@ STEPS = [
     "fetch_openalex.py",  # citations, yearly trend, citing articles
     "fetch_github.py",    # stars, forks, last commit
     "fetch_hf.py",        # weight downloads
+    "fetch_runnable.py",  # packaging, releases, notebooks, issue response
     "build_data.py",      # score, snapshot history, write data/*.json
     "make_feed.py",       # publish data/changelog.json as feed.xml
 ]

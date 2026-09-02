@@ -12,6 +12,11 @@
     "  cells    - number of cells in the pretraining corpus.",
     "  tasks    - annotation | integration | imputation | perturbation | grn | spatial",
     "  license  - SPDX id where known; 'non-commercial' flags restricted weights.",
+    "  pypi     - PyPI package name, only where auto-detection cannot confirm it.",
+    "             fetch_runnable.py accepts a package on its own only when the",
+    "             package metadata links back to this repo; scPRINT ships from the",
+    "             author's personal namespace and arc-state publishes no URLs at",
+    "             all, so those two are named here instead of guessed.",
     "Leave a field null rather than guessing - nulls render as 'not reported'."
   ],
   "models": [
@@ -417,7 +422,8 @@
       ],
       "license": null,
       "weights_open": true,
-      "notes": "Explicitly targets gene-network inference rather than embedding quality alone."
+      "notes": "Explicitly targets gene-network inference rather than embedding quality alone.",
+      "pypi": "scprint"
     },
     {
       "id": "aido-cell",
@@ -467,7 +473,8 @@
       ],
       "license": null,
       "weights_open": true,
-      "notes": "Perturbation-first design; the current reference point for in-silico perturbation claims."
+      "notes": "Perturbation-first design; the current reference point for in-silico perturbation claims.",
+      "pypi": "arc-state"
     },
     {
       "id": "transcriptformer",

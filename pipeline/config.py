@@ -25,6 +25,10 @@ GITHUB_DELAY = 0.2
 HF_API = "https://huggingface.co/api"
 HF_DELAY = 0.2
 
+# Runnability: PyPI packaging, pinned environments, tagged releases, notebooks
+# and recent issue activity. Read from the GitHub API plus PyPI's JSON endpoint.
+PYPI_API = "https://pypi.org/pypi"
+
 # Discovery scan for new candidate models.
 BIORXIV_API = "https://api.biorxiv.org/details/biorxiv"
 ARXIV_API = "http://export.arxiv.org/api/query"
@@ -43,8 +47,25 @@ SCORE_WEIGHTS = {
     "attention": 0.35,   # log-scaled total citations
     "momentum": 0.25,    # citations gained recently
     "usage": 0.20,       # Hugging Face downloads + GitHub stars
-    "openness": 0.20,    # open weights + permissive license + active upkeep
+    "openness": 0.10,    # open weights + permissive license + active upkeep
+    "runnable": 0.10,    # packaged, pinned, released, documented, answered
 }
+# Runnability was carved out of openness rather than taken from the citation
+# weights: both answer "can I use this", so the practical-usability family
+# keeps the 0.20 it always had, and attention/momentum/usage are untouched.
+
+# Signals inside the runnability component. A model is scored on the signals
+# that could actually be observed for it -- a repo whose tree call failed is
+# not credited with having no notebooks -- so these are renormalized per model
+# by the weight of what was seen.
+RUNNABLE_WEIGHTS = {
+    "installable": 0.25,   # a PyPI package that links back to the repo
+    "env": 0.20,           # requirements / environment / pyproject / Dockerfile
+    "release": 0.15,       # a tagged release to pin
+    "tutorials": 0.15,     # notebooks in the repo
+    "responsive": 0.25,    # an issue closed in the trailing 90 days
+}
+TUTORIALS_FULL_CREDIT = 3   # notebooks needed for full marks on that signal
 # Momentum window. Counted from the publication dates carried on the citing
 # records themselves, not from snapshot arithmetic, so it is exact on the first
 # run and retroactive for every model rather than waiting on history to deepen.
@@ -58,6 +79,7 @@ CITING_PER_MODEL = 40    # citing articles kept in the upfront index
 
 # Files
 RESOLVED_FILE = os.path.join(CACHE_DIR, "resolved.json")
+RUNNABLE_FILE = os.path.join(CACHE_DIR, "runnable.json")
 OPENALEX_FILE = os.path.join(CACHE_DIR, "openalex.json")
 GITHUB_FILE = os.path.join(CACHE_DIR, "github.json")
 HF_FILE = os.path.join(CACHE_DIR, "huggingface.json")
