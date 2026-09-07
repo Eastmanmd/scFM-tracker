@@ -3,10 +3,17 @@
   <title>Single-Cell Foundation Model Tracker — weekly changes</title>
   <subtitle>What moved in the single-cell foundation model field this week: new models, rank changes, repositories going quiet, and new benchmarking papers.</subtitle>
   <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker</id>
-  <updated>2026-09-01T06:00:00Z</updated>
+  <updated>2026-09-07T06:00:00Z</updated>
   <link rel="alternate" type="text/html" href="https://eastmanmd.github.io/scFM-tracker/"/>
   <link rel="self" type="application/atom+xml" href="https://eastmanmd.github.io/scFM-tracker/feed.xml"/>
   <author><name>Ali Eastman Oku</name></author>
+  <entry>
+    <title>Week of 2026-09-07: 4 changes</title>
+    <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker/changelog/2026-09-07</id>
+    <updated>2026-09-07T06:00:00Z</updated>
+    <link rel="alternate" type="text/html" href="https://eastmanmd.github.io/scFM-tracker/"/>
+    <content type="html">&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Upkeep&lt;/strong&gt; — GeneCompass's repository is being actively developed again.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;New evaluation&lt;/strong&gt; — “Benchmarking biomedical foundation models” (Nature Methods) — covers Nicheformer. &lt;a href="https://doi.org/10.1038/s41592-026-03182-y"&gt;DOI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;New evaluation&lt;/strong&gt; — “Basal expression predicts context-specific drug responses only where they are reproducible: a leakage-safe 47-line LOCO benchmark on Tahoe-100M” (Research Square) — covers STATE. &lt;a href="https://doi.org/10.21203/rs.3.rs-10846736/v1"&gt;DOI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Citations&lt;/strong&gt; — 20 other citing papers newly indexed, none of them evaluations.&lt;/li&gt;&lt;/ul&gt;</content>
+  </entry>
   <entry>
     <title>Week of 2026-09-01: nothing changed</title>
     <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker/changelog/2026-09-01</id>

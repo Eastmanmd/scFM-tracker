@@ -13,6 +13,38 @@
   {
    "date": "2026-09-01",
    "events": []
+  },
+  {
+   "date": "2026-09-07",
+   "events": [
+    {
+     "type": "upkeep",
+     "text": "GeneCompass's repository is being actively developed again.",
+     "models": [
+      "genecompass"
+     ]
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBenchmarking biomedical foundation models\u201d (Nature Methods) \u2014 covers Nicheformer.",
+     "models": [
+      "nicheformer"
+     ],
+     "url": "https://doi.org/10.1038/s41592-026-03182-y"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBasal expression predicts context-specific drug responses only where they are reproducible: a leakage-safe 47-line LOCO benchmark on Tahoe-100M\u201d (Research Square) \u2014 covers STATE.",
+     "models": [
+      "state"
+     ],
+     "url": "https://doi.org/10.21203/rs.3.rs-10846736/v1"
+    },
+    {
+     "type": "citing",
+     "text": "20 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }
