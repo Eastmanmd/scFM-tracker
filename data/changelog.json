@@ -45,6 +45,52 @@
      "text": "20 other citing papers newly indexed, none of them evaluations."
     }
    ]
+  },
+  {
+   "date": "2026-09-14",
+   "events": [
+    {
+     "type": "upkeep",
+     "text": "Geneformer's repository is being actively developed again.",
+     "models": [
+      "geneformer"
+     ]
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cA systematic comparison of single-cell perturbation response prediction models\u201d (Science Advances) \u2014 covers scGPT, Geneformer, scFoundation, STATE.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scfoundation",
+      "state"
+     ],
+     "url": "https://doi.org/10.1126/sciadv.aed3414"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cCell-type separability predicts annotation accuracy and outweighs algorithm choice: a factorial benchmark across seven scRNA paradigms\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, scBERT, scFoundation.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scbert",
+      "scfoundation"
+     ],
+     "url": "https://doi.org/10.64898/2026.08.28.747622"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cscDiagnostics: systematic assessment of cell type annotation in single-cell transcriptomics data\u201d (Briefings in Bioinformatics) \u2014 covers scGPT.",
+     "models": [
+      "scgpt"
+     ],
+     "url": "https://doi.org/10.1093/bib/bbag496"
+    },
+    {
+     "type": "citing",
+     "text": "26 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }

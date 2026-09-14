@@ -3,10 +3,17 @@
   <title>Single-Cell Foundation Model Tracker — weekly changes</title>
   <subtitle>What moved in the single-cell foundation model field this week: new models, rank changes, repositories going quiet, and new benchmarking papers.</subtitle>
   <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker</id>
-  <updated>2026-09-07T06:00:00Z</updated>
+  <updated>2026-09-14T06:00:00Z</updated>
   <link rel="alternate" type="text/html" href="https://eastmanmd.github.io/scFM-tracker/"/>
   <link rel="self" type="application/atom+xml" href="https://eastmanmd.github.io/scFM-tracker/feed.xml"/>
   <author><name>Ali Eastman Oku</name></author>
+  <entry>
+    <title>Week of 2026-09-14: 5 changes</title>
+    <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker/changelog/2026-09-14</id>
+    <updated>2026-09-14T06:00:00Z</updated>
+    <link rel="alternate" type="text/html" href="https://eastmanmd.github.io/scFM-tracker/"/>
+    <content type="html">&lt;ul&gt;&lt;li&gt;&lt;strong&gt;Upkeep&lt;/strong&gt; — Geneformer's repository is being actively developed again.&lt;/li&gt;&lt;li&gt;&lt;strong&gt;New evaluation&lt;/strong&gt; — “A systematic comparison of single-cell perturbation response prediction models” (Science Advances) — covers scGPT, Geneformer, scFoundation, STATE. &lt;a href="https://doi.org/10.1126/sciadv.aed3414"&gt;DOI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;New evaluation&lt;/strong&gt; — “Cell-type separability predicts annotation accuracy and outweighs algorithm choice: a factorial benchmark across seven scRNA paradigms” (bioRxiv (Cold Spring Harbor Laboratory)) — covers scGPT, Geneformer, scBERT, scFoundation. &lt;a href="https://doi.org/10.64898/2026.08.28.747622"&gt;DOI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;New evaluation&lt;/strong&gt; — “scDiagnostics: systematic assessment of cell type annotation in single-cell transcriptomics data” (Briefings in Bioinformatics) — covers scGPT. &lt;a href="https://doi.org/10.1093/bib/bbag496"&gt;DOI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Citations&lt;/strong&gt; — 26 other citing papers newly indexed, none of them evaluations.&lt;/li&gt;&lt;/ul&gt;</content>
+  </entry>
   <entry>
     <title>Week of 2026-09-07: 4 changes</title>
     <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker/changelog/2026-09-07</id>
