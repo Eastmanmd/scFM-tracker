@@ -91,6 +91,32 @@
      "text": "26 other citing papers newly indexed, none of them evaluations."
     }
    ]
+  },
+  {
+   "date": "2026-09-21",
+   "events": [
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBenchmarking methods for inferring single-cell transcription factor activity using large-scale perturbation sequencing data\u201d (Briefings in Bioinformatics) \u2014 covers scGPT, scFoundation.",
+     "models": [
+      "scgpt",
+      "scfoundation"
+     ],
+     "url": "https://doi.org/10.1093/bib/bbag513"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cAn open benchmark and language models for AI in aging biology\u201d (Cell) \u2014 covers scGPT.",
+     "models": [
+      "scgpt"
+     ],
+     "url": "https://doi.org/10.1016/j.cell.2026.08.026"
+    },
+    {
+     "type": "citing",
+     "text": "23 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }
