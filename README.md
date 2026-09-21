@@ -221,6 +221,57 @@ Two limits are worth stating plainly:
 Abstracts cover 83–93% of citing works and ride along in the same paged
 OpenAlex request, so the second axis costs no extra API calls.
 
+## How new models get found
+
+The registry is curated by hand, and stays that way — whether something is a
+single-cell RNA-seq foundation model is a judgement, not a keyword match. What
+runs automatically is the *search*, not the decision.
+
+Each week `pipeline/discover.py` scans bioRxiv and arXiv for a handful of
+phrases (`single-cell foundation model`, `cell language model`, and so on,
+matched after lowercasing and folding hyphens so "single-cell" and "single
+cell" are one term). Anything that matches lands in
+`pipeline/discovery_queue.json` with a status of `new`. Nothing is ever added
+to the registry automatically.
+
+Reviewing a row means setting its status:
+
+| status | meaning |
+| --- | --- |
+| `new` | not yet reviewed — what the scan writes |
+| `dismissed` | not an scFM; stop surfacing it |
+| `added` | promoted into `registry.json` |
+
+Dismissed rows stay in the file. That is the point of committing the queue
+rather than caching it: `cache/` is gitignored and rebuilt on demand, so a
+dismissal kept there would evaporate and the same rejects would reappear every
+week. The queue sits next to `registry.json` because it is the same kind of
+file — one a human maintains.
+
+Three details that the two APIs force:
+
+- **bioRxiv has no term search.** Its details endpoint pages a date interval
+  thirty records at a time, about 1,700 preprints a week, and the filtering
+  happens locally. So the scan is incremental: `cache/discovery.json` records
+  the date already paged and the next run starts there. It also runs a few
+  days of overlap, because preprints post later than the date they carry.
+- **The window is scanned in chunks, and the watermark advances per chunk.**
+  A page costs roughly six seconds, so a run works to a page budget. When the
+  budget runs out mid-window the ground already covered is still recorded and
+  the next run resumes from it. Advancing only on a fully clean sweep would
+  mean a capped run re-reads the same opening pages every week and never
+  reaches recent days.
+- **Deduplication is deliberately one-sided.** A DOI already in the registry
+  drops the candidate. A registry *name* appearing in a title only annotates
+  it, because the names that would trip false matches are exactly the ordinary
+  words — STATE, UCE — and silently hiding "cell state transitions after
+  perturbation" to save one glance is the wrong trade for a tool whose job is
+  not missing things.
+
+Discovery runs last in the pipeline and its failure is not fatal. It feeds no
+score and no page, so a bioRxiv outage should not strand a week of real
+citation data uncommitted.
+
 ---
 
 Data: [OpenAlex](https://openalex.org/) ·

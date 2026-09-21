@@ -15,9 +15,31 @@ STEPS = [
     "make_feed.py",       # publish data/changelog.json as feed.xml
 ]
 
-for step in STEPS:
+# Discovery only suggests candidates for review -- it feeds no metric and no
+# page. A bioRxiv outage should not fail the run and strand a week of real
+# citation data uncommitted, so it runs last and its exit code is reported
+# rather than fatal.
+OPTIONAL_STEPS = [
+    "discover.py",        # queue new candidate models in discovery_queue.json
+]
+
+
+def run(step):
     print("\n=== {} ===".format(step), flush=True)
-    result = subprocess.run([sys.executable, os.path.join(HERE, step)])
-    if result.returncode != 0:
-        sys.exit("{} failed with exit code {}".format(step, result.returncode))
+    return subprocess.run([sys.executable, os.path.join(HERE, step)]).returncode
+
+
+for step in STEPS:
+    code = run(step)
+    if code != 0:
+        sys.exit("{} failed with exit code {}".format(step, code))
+
+failed = []
+for step in OPTIONAL_STEPS:
+    if run(step) != 0:
+        failed.append(step)
+        print("{} failed -- continuing, it feeds no published metric".format(step))
+
 print("\nPipeline complete.")
+if failed:
+    print("Optional step(s) did not complete: {}".format(", ".join(failed)))

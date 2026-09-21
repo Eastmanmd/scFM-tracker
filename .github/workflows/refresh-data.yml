@@ -42,6 +42,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # feed.xml is generated output too, and it lives at the repo root
           # because a feed URL has to be stable and short.
-          git add data/ feed.xml
+          # pipeline/discovery_queue.json is the review queue: discover.py
+          # appends to it and it must be committed, because cache/ is
+          # gitignored and a dismissal has to outlive the cache.
+          git add data/ feed.xml pipeline/discovery_queue.json
           git diff --cached --quiet || git commit -m "Weekly refresh $(date -u +%F)"
           git push

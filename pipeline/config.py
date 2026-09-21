@@ -29,7 +29,10 @@ HF_DELAY = 0.2
 # and recent issue activity. Read from the GitHub API plus PyPI's JSON endpoint.
 PYPI_API = "https://pypi.org/pypi"
 
-# Discovery scan for new candidate models.
+# Discovery scan for new candidate models. Terms are matched against titles and
+# abstracts after both sides are normalized (lowercased, hyphens and dashes
+# folded to spaces), so "single-cell" and "single cell" are the same string and
+# the pair below collapses to one test rather than two.
 BIORXIV_API = "https://api.biorxiv.org/details/biorxiv"
 ARXIV_API = "http://export.arxiv.org/api/query"
 DISCOVERY_TERMS = [
@@ -41,6 +44,41 @@ DISCOVERY_TERMS = [
     "pretrained single-cell",
 ]
 DISCOVERY_WINDOW_DAYS = 30
+
+# bioRxiv has no term search: the details endpoint pages a date interval 30
+# records at a time and the filtering happens here. A week is roughly 1,700
+# preprints, so the scan is incremental -- cache/discovery.json records the
+# date already paged and the next run starts there, not 30 days back.
+BIORXIV_DELAY = 0.3
+BIORXIV_PAGE = 30           # records per page, fixed by the API
+# bioRxiv answers a page in roughly six seconds, so the run is bounded by a
+# page budget rather than wall time. The window is scanned in chunks and the
+# watermark advances after each *completed* chunk: a run that exhausts its
+# budget still makes progress, and the next one resumes where it stopped.
+# Without that, a budget hit would re-read the same opening pages every week
+# and the scan would never reach recent days.
+BIORXIV_CHUNK_DAYS = 7
+BIORXIV_PAGE_BUDGET = 150   # ~15 min at 6s/page; a normal week needs ~80
+# Preprints are posted days after the date they carry, so a window that starts
+# exactly where the last one ended misses the stragglers. Re-page a few days of
+# overlap; deduping by DOI makes the repeats free.
+DISCOVERY_OVERLAP_DAYS = 3
+
+# arXiv does have term search, so each term is one query. Their docs ask for a
+# 3-second gap between calls.
+ARXIV_DELAY = 3.0
+ARXIV_MAX_RESULTS = 100
+
+# The queue of candidates awaiting review. This is committed and hand-edited --
+# it is the second file in the repo maintained by a human, and deliberately NOT
+# in cache/, which is gitignored and rebuilt on demand. A dismissal is a
+# judgement call that has to survive a cache wipe, or every week re-surfaces
+# the same rejects. discover.py only ever appends; it never changes a status
+# and never touches registry.json.
+DISCOVERY_QUEUE_FILE = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "discovery_queue.json")
+DISCOVERY_STATUSES = ("new", "dismissed", "added")
+DISCOVERY_ABSTRACT_CHARS = 600   # kept per candidate, enough to judge from
 
 # Scoring. Weights are the defaults; the site's sliders re-weight client-side.
 SCORE_WEIGHTS = {

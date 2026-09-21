@@ -1,0 +1,107 @@
+{
+ "_comment": [
+  "Candidate models found by pipeline/discover.py, awaiting review.",
+  "",
+  "This file is hand-edited, like registry.json. discover.py only ever",
+  "appends new candidates and refreshes the fields of existing ones; it",
+  "never sets a status and never edits registry.json.",
+  "",
+  "To review a row, set its status:",
+  "  new       - not yet reviewed (what discover.py writes)",
+  "  dismissed - not an scRNA-seq foundation model, stop showing it",
+  "  added     - promoted into registry.json",
+  "",
+  "Add a 'note' to a row to record why. Dismissed rows stay here so the",
+  "judgement survives; they are counted, not re-surfaced.",
+  "",
+  "matches_tracked_model flags a registry name appearing in the title.",
+  "It is a hint, not a verdict -- check before dismissing on it."
+ ],
+ "schema": 1,
+ "candidates": [
+  {
+   "key": "10.64898/2026.09.10.750801",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.09.10.750801",
+   "url": "https://doi.org/10.64898/2026.09.10.750801",
+   "title": "scACORN: Context-engineered agent orchestration of specialized small language models for single-cell transcriptomic interpretation",
+   "abstract": "Single-cell atlases now exceed 66 million cells, but turning a ranked expression profile and a free-form biological question into a reliable, evidence-grounded answer remains unsolved. Scaling a single model does not resolve this, because single-cell interpretation is a heterogeneous family of tasks whose correct answer depends on tissue, cohort, perturbation and annotation resolution. Here we present scACORN, an agentic alternative to monolithic single-cell language models that combines specialized small language models with context-engineered agent orchestration for their selection and compo",
+   "date": "2026-09-16",
+   "authors": "Rasti-Meymandi, A.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "cell language model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "scACORN",
+   "first_seen": "2026-09-21",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.09.10.746481",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.09.10.746481",
+   "url": "https://doi.org/10.64898/2026.09.10.746481",
+   "title": "REN-former prioritizes candidate regulators of kidney disease-state transitions through single-cell foundation modeling and human genetics",
+   "abstract": "Background Acute kidney injury (AKI)-to-chronic kidney disease (CKD) transition is associated with dynamic changes in tubular cell state. However, conventional single-cell transcriptomic analyses primarily identify genes differentially expressed between disease states and do not directly evaluate genes associated with directional transitions between cellular states. Methods We developed REN-former by fine-tuning Geneformer using the GSE183276 single-cell RNA-sequencing dataset from 45 participants representing Normal Reference, AKI, and CKD states. In silico gene deletion and overexpression an",
+   "date": "2026-09-15",
+   "authors": "Mimura, I.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-09-21",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "arxiv:2609.14970",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2609.14970v1",
+   "title": "Towards a knowledge-enhanced single-cell foundation model",
+   "abstract": "Single-cell foundation models (scFMs) increasingly rely on large-scale transcriptomic pretraining, yet expanding pretraining data can yield diminishing gains while substantially increasing computational cost. Our data scaling analyses showed that incorporating biological knowledge, including cell-level text annotation and gene-level regulatory information, provided additional scaling dimension than simply increasing data size. Motivated by this observation, we present scKITE, a simple yet effective scFM that integrates cell-annotation and gene-regulatory supervision into a shared transcriptomi",
+   "date": "2026-09-14",
+   "authors": "Hanqing Zhang",
+   "category": "cs.AI",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "scKITE",
+   "first_seen": "2026-09-21",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "arxiv:2609.14147",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2609.14147v1",
+   "title": "RAGCell: Retrieval-Augmented Generation as Supervision for Versatile Single-cell Analysis",
+   "abstract": "Single-cell foundation models (scFMs) are transforming computational biology by enabling generalizable, task-agnostic representations for versatile single-cell analysis. Despite their progress in facilitating rapid deployment for downstream tasks, off-the-shelf scFMs still have some overlooked concerns: (I) (Pretraining Cost.) Pretrain-based scFMs necessitate pretraining on a vast volume of cells, rendering it draining resources in applications. (II) (Heterogeneous Gap.) Large Language Models (LLM)-based scFMs ignore the tremendous heterogeneous gap between LLM textual and raw cellular spaces,",
+   "date": "2026-09-12",
+   "authors": "Tianyu Liu",
+   "category": "q-bio.GN",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "RAGCell",
+   "first_seen": "2026-09-21",
+   "status": "new",
+   "schema": 1
+  }
+ ],
+ "updated": "2026-09-21",
+ "counts": {
+  "new": 4
+ }
+}
