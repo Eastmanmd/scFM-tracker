@@ -3,10 +3,17 @@
   <title>Single-Cell Foundation Model Tracker — weekly changes</title>
   <subtitle>What moved in the single-cell foundation model field this week: new models, rank changes, repositories going quiet, and new benchmarking papers.</subtitle>
   <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker</id>
-  <updated>2026-09-21T06:00:00Z</updated>
+  <updated>2026-09-28T06:00:00Z</updated>
   <link rel="alternate" type="text/html" href="https://eastmanmd.github.io/scFM-tracker/"/>
   <link rel="self" type="application/atom+xml" href="https://eastmanmd.github.io/scFM-tracker/feed.xml"/>
   <author><name>Ali Eastman Oku</name></author>
+  <entry>
+    <title>Week of 2026-09-28: 2 changes</title>
+    <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker/changelog/2026-09-28</id>
+    <updated>2026-09-28T06:00:00Z</updated>
+    <link rel="alternate" type="text/html" href="https://eastmanmd.github.io/scFM-tracker/"/>
+    <content type="html">&lt;ul&gt;&lt;li&gt;&lt;strong&gt;New evaluation&lt;/strong&gt; — “Evaluating Large‐Language Models in Bioinformatics Applications” (Advanced Computing) — covers scGPT. &lt;a href="https://doi.org/10.1002/adco.70007"&gt;DOI&lt;/a&gt;&lt;/li&gt;&lt;li&gt;&lt;strong&gt;Citations&lt;/strong&gt; — 17 other citing papers newly indexed, none of them evaluations.&lt;/li&gt;&lt;/ul&gt;</content>
+  </entry>
   <entry>
     <title>Week of 2026-09-21: 3 changes</title>
     <id>tag:eastmanmd.github.io,2026-08-16:scfm-tracker/changelog/2026-09-21</id>

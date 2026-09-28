@@ -20,6 +20,26 @@
  "schema": 1,
  "candidates": [
   {
+   "key": "arxiv:2609.23325",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2609.23325v1",
+   "title": "Rethinking Class Imbalance for Single-Cell Foundation Models: A Systematic Benchmark Across Architectures and Long-Tail Loss Functions",
+   "abstract": "Single-cell foundation models (scGPT, scBERT, Geneformer) achieve cell-type classification accuracy up to 97.5% in our experiments, yet this aggregate accuracy can mask systematic failure on rare, often disease-relevant cell populations that long-tail loss functions are widely assumed to address. We present a systematic benchmark of six long-tail loss functions (cross-entropy, weighted CE, class-balanced loss, focal loss, LDAM, logit-adjusted softmax) across three architectures and three datasets (Multiple Sclerosis, Zheng68K, human Pancreas), totaling 162 controlled training runs (3 backbones",
+   "date": "2026-09-20",
+   "authors": "Zeyu Dong",
+   "category": "cs.LG",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
+  },
+  {
    "key": "10.64898/2026.09.10.750801",
    "source": "biorxiv",
    "doi": "10.64898/2026.09.10.750801",
@@ -80,6 +100,26 @@
    "schema": 1
   },
   {
+   "key": "10.64898/2026.09.08.750024",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.09.08.750024",
+   "url": "https://doi.org/10.64898/2026.09.08.750024",
+   "title": "LucaCell: a sequence-centric foundation model for cross-species single-cell analysis",
+   "abstract": "Single-cell foundation models have transformed transcriptomic analysis, yet most rely on fixed gene identifiers that limit transfer across species and data types. Here we present LucaCell, a sequence-centric foundation model that represents genes through pre-trained mRNA sequence embeddings rather than static gene annotations. Gene expression is discretized into bins and modeled with a Transformer encoder, enabling sequence-informed cell representation without a fixed gene-ID vocabulary. Pre-training on 85 million human and mouse single cells, LucaCell is evaluated on human, mouse and lemur ge",
+   "date": "2026-09-14",
+   "authors": "Sun, Y.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "LucaCell",
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
+  },
+  {
    "key": "arxiv:2609.14147",
    "source": "arxiv",
    "doi": null,
@@ -98,10 +138,131 @@
    "first_seen": "2026-09-21",
    "status": "new",
    "schema": 1
+  },
+  {
+   "key": "10.64898/2026.09.08.749477",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.09.08.749477",
+   "url": "https://doi.org/10.64898/2026.09.08.749477",
+   "title": "PHAROS: turning single-cell perturbation models into target-directed drug-combination screens",
+   "abstract": "Combination therapies are central to cancer treatment, but exhaustive screening is impractical. We introduce PHAROS, a framework that turns a pretrained single-cell perturbation model into a target-directed search engine for drug combinations. PHAROS predicts how a cell population changes under a drug, one drug at a time, then chains these predictions together to simulate drug combinations. It scores each simulated outcome against the desired target state and uses a search algorithm to find the most promising combinations, all without retraining the underlying model. Across two independent com",
+   "date": "2026-09-10",
+   "authors": "Bezney, J.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "pretrained single cell"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "PHAROS",
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.1101/2025.10.31.685892",
+   "source": "biorxiv",
+   "doi": "10.1101/2025.10.31.685892",
+   "url": "https://doi.org/10.1101/2025.10.31.685892",
+   "title": "Empirical Evaluation of Single-Cell Foundation Models for Predicting Cancer Outcomes",
+   "abstract": "Foundation models pretrained on large-scale single-cell RNA sequencing data present a promising opportunity to advance translational cancer research. However, their utility in clinically relevant, patient-level single-cell applications remains underexplored. Here, we developed an agentic strategy to systematically evaluate twelve emerging single-cell foundation models (scFMs) and three alternative baseline approaches across seven cancer-specific tasks, including cell-type annotation, cancer subtype classification, and treatment response prediction. We assessed model performance under zero-shot",
+   "date": "2026-09-09",
+   "authors": "Roman, A.",
+   "category": "cancer biology",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.08.31.748446",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.08.31.748446",
+   "url": "https://doi.org/10.64898/2026.08.31.748446",
+   "title": "Cross-domain confidence reliability and remappability of frozen single-cell representations",
+   "abstract": "Single-cell foundation models are increasingly adopted for downstream applications such as cell-type prediction. However, these predictions are often utilized without assessing their reliability, or by relying on a simple cutoff applied to the maximum softmax probability (MSP) derived from the classifier. This raises a critical question: can raw MSP be trusted as a reliable measure of confidence on unseen data (target) exhibiting diverse technical and biological variations? To address this, we introduce an audit framework to systematically evaluate the confidence estimates derived from the tra",
+   "date": "2026-09-04",
+   "authors": "Weng, G.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.08.31.747784",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.08.31.747784",
+   "url": "https://doi.org/10.64898/2026.08.31.747784",
+   "title": "scRep: A Latent-Space Self-Distilled Foundation Model for Single-Cell Representation Learning",
+   "abstract": "Single-cell foundation models have shown strong potential for learning transferable representations from large-scale transcriptomic data. However, many existing approaches rely on reconstructing masked gene expression values, creating a potential mismatch between observation-space reconstruction and the goal of learning stable biological representations. This challenge is particularly relevant to single-cell RNA sequencing, where sparsity, incomplete gene detection, and technical variation can obscure the underlying biological state. Here, we introduce scRep, a compact latent-space self-distil",
+   "date": "2026-09-03",
+   "authors": "Wang, S.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "foundation model for single cell",
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "scRep",
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.08.01.742180",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.08.01.742180",
+   "url": "https://doi.org/10.64898/2026.08.01.742180",
+   "title": "scMaize: A Single-Cell Foundation Model and Integrated Atlas for Maize",
+   "abstract": "Single-cell transcriptomics has resolved cell-type-specific gene expression in plants, yet maize still lacks an integrated reference and species-specific foundation models. We present scMaize, combining scMaizeAtlas, an integrated atlas of 385,675 cells from 20 projects and 66 samples across seven tissues with hierarchical annotation, with two Transformer-based foundation models pretrained on this atlas. scMaizeExp serves as an expression-only baseline, while scMaizeGO incorporates Gene Ontology (GO) functional embeddings as an inductive bias. Although global expression-prediction accuracy was",
+   "date": "2026-09-03",
+   "authors": "Cheng, Q.",
+   "category": "plant biology",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "scMaize",
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.01.06.698060",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.01.06.698060",
+   "url": "https://doi.org/10.64898/2026.01.06.698060",
+   "title": "Accessible and reproducible deployment reveals the practical boundaries of single-cell foundation models",
+   "abstract": "Single-cell foundation models (scFMs) have been widely promoted as a unifying paradigm for transcriptomic analysis, yet whether large-scale pretraining translates into reproducible biological advantages remains unclear. Their adoption is further hindered by heterogeneous implementations, preprocessing requirements, and computational environments. Here we develop a unified, automated, and reproducible framework for standardized deployment and controlled evaluation of scFMs across datasets, computational environments, training regimes, and downstream analyses, substantially lowering the technica",
+   "date": "2026-09-02",
+   "authors": "Hou, S.",
+   "category": "bioinformatics",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-09-28",
+   "status": "new",
+   "schema": 1
   }
  ],
- "updated": "2026-09-21",
+ "updated": "2026-09-28",
  "counts": {
-  "new": 4
+  "new": 12
  }
 }

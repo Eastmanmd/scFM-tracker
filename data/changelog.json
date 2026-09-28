@@ -117,6 +117,23 @@
      "text": "23 other citing papers newly indexed, none of them evaluations."
     }
    ]
+  },
+  {
+   "date": "2026-09-28",
+   "events": [
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cEvaluating Large\u2010Language Models in Bioinformatics Applications\u201d (Advanced Computing) \u2014 covers scGPT.",
+     "models": [
+      "scgpt"
+     ],
+     "url": "https://doi.org/10.1002/adco.70007"
+    },
+    {
+     "type": "citing",
+     "text": "17 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }
