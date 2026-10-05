@@ -134,6 +134,22 @@
      "text": "17 other citing papers newly indexed, none of them evaluations."
     }
    ]
+  },
+  {
+   "date": "2026-10-05",
+   "events": [
+    {
+     "type": "upkeep",
+     "text": "CellHermes's repository has slowed \u2014 no commit in over 90 days.",
+     "models": [
+      "cellhermes"
+     ]
+    },
+    {
+     "type": "citing",
+     "text": "23 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }

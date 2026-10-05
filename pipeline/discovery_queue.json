@@ -20,6 +20,66 @@
  "schema": 1,
  "candidates": [
   {
+   "key": "arxiv:2609.38908",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2609.38908v1",
+   "title": "CellMSA: Context Modeling for Single-Cell Representation Learning",
+   "abstract": "Single-cell transcriptomics enables profiling of cellular states at unprecedented resolution, but its high dimensionality, sparsity, and technical batch effects pose significant challenges for representation learning. Existing single-cell foundation models typically encode each cell independently or only model cells from the same batch for denoising, thereby underutilizing the rich relational information across batches and cell types to model gene expression patterns. We argue that single-cell models can benefit from more informative cell-context modeling. By comparing consistency and variatio",
+   "date": "2026-09-30",
+   "authors": "Suyuan Zhao",
+   "category": "q-bio.GN",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "CellMSA",
+   "first_seen": "2026-10-05",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.09.21.753191",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.09.21.753191",
+   "url": "https://doi.org/10.64898/2026.09.21.753191",
+   "title": "Benchmarking single-cell foundation models for aging biology",
+   "abstract": "Single cell foundation models (scFMs) provide representations of cellular states, but their utility across biological questions in aging research remains unclear. We established a benchmark of cellular representations for aging research, evaluating ten general-purpose scFMs, three aging-specific models and conventional methods across five biological questions using more than 2.5 million single cell transcriptomes. Using frozen pretrained representations, Geneformer performed best among scFMs for chronological age prediction and age pseudotime concordance, although 2,000 highly variable genes a",
+   "date": "2026-09-27",
+   "authors": "Ni, X.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-10-05",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.09.22.752128",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.09.22.752128",
+   "url": "https://doi.org/10.64898/2026.09.22.752128",
+   "title": "Speciesformer learns conserved cellular states for cross-species generative virtual cell modeling",
+   "abstract": "Cells across species are governed by evolutionarily conserved biological programs, yet their molecular states and responses are reshaped by species, tissue and cellular context. A central challenge for virtual cell modeling is therefore to learn cellular states and state transitions that separate transferable biological principles from context-specific variation. Existing single-cell foundation models have advanced cellular representation learning, but most remain focused on single-species analysis, discriminative tasks or specialized forms of generation. Here we present Speciesformer, a cross",
+   "date": "2026-09-23",
+   "authors": "Wang, J.",
+   "category": "systems biology",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-10-05",
+   "status": "new",
+   "schema": 1
+  },
+  {
    "key": "arxiv:2609.23325",
    "source": "arxiv",
    "doi": null,
@@ -261,8 +321,8 @@
    "schema": 1
   }
  ],
- "updated": "2026-09-28",
+ "updated": "2026-10-05",
  "counts": {
-  "new": 12
+  "new": 15
  }
 }
