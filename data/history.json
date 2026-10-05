@@ -2001,29 +2001,29 @@
      "benchmark": 59,
      "runnable": 0.15
     },
-    "scbert": {
-     "citations": 651,
-     "stars": 364,
-     "downloads": 0,
-     "biology_share": 0.043,
-     "rank": 4,
-     "score": 69.6,
-     "license": "GPL-3.0",
-     "upkeep": "dormant",
-     "benchmark": 35,
-     "runnable": 0.35
-    },
     "state": {
      "citations": 86,
      "stars": 712,
      "downloads": 853,
      "biology_share": 0.129,
-     "rank": 5,
-     "score": 68.4,
+     "rank": 4,
+     "score": 69.9,
      "license": "NOASSERTION",
      "upkeep": "active",
      "benchmark": 7,
-     "runnable": 0.45
+     "runnable": 0.6
+    },
+    "scbert": {
+     "citations": 651,
+     "stars": 364,
+     "downloads": 0,
+     "biology_share": 0.043,
+     "rank": 5,
+     "score": 69.6,
+     "license": "GPL-3.0",
+     "upkeep": "dormant",
+     "benchmark": 35,
+     "runnable": 0.35
     },
     "uce": {
      "citations": 189,
@@ -2050,12 +2050,12 @@
      "runnable": 0.35
     },
     "genecompass": {
-     "citations": 153,
+     "citations": 154,
      "stars": 124,
      "downloads": 0,
-     "biology_share": 0.049,
+     "biology_share": 0.048,
      "rank": 8,
-     "score": 57.7,
+     "score": 57.8,
      "license": null,
      "upkeep": "active",
      "benchmark": 16,
@@ -2085,29 +2085,29 @@
      "benchmark": 6,
      "runnable": 1.0
     },
+    "cellplm": {
+     "citations": 76,
+     "stars": 107,
+     "downloads": 0,
+     "biology_share": 0.0,
+     "rank": 11,
+     "score": 52.5,
+     "license": "BSD-2-Clause",
+     "upkeep": "dormant",
+     "benchmark": 10,
+     "runnable": 0.6
+    },
     "cellfm": {
      "citations": 86,
      "stars": 115,
      "downloads": 0,
      "biology_share": 0.127,
-     "rank": 11,
+     "rank": 12,
      "score": 52.5,
      "license": "NOASSERTION",
      "upkeep": "active",
      "benchmark": 5,
      "runnable": 0.15
-    },
-    "cellplm": {
-     "citations": 75,
-     "stars": 107,
-     "downloads": 0,
-     "biology_share": 0.0,
-     "rank": 12,
-     "score": 52.3,
-     "license": "BSD-2-Clause",
-     "upkeep": "dormant",
-     "benchmark": 10,
-     "runnable": 0.6
     },
     "aido-cell": {
      "citations": 15,
@@ -2115,7 +2115,7 @@
      "downloads": 1518,
      "biology_share": 0.0,
      "rank": 13,
-     "score": 51.9,
+     "score": 52.3,
      "license": "NOASSERTION",
      "upkeep": "active",
      "benchmark": 3,
@@ -2146,12 +2146,12 @@
      "runnable": 0.75
     },
     "scmulan": {
-     "citations": 33,
+     "citations": 34,
      "stars": 63,
      "downloads": 0,
      "biology_share": 0.0,
      "rank": 16,
-     "score": 40.9,
+     "score": 41.2,
      "license": "MIT",
      "upkeep": "dormant",
      "benchmark": 1,
