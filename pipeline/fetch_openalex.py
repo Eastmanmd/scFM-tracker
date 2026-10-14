@@ -72,21 +72,45 @@ def fetch_work(work_id):
 
 
 def fetch_citing(work_id):
-    """Every work citing work_id, via cursor pagination."""
+    """Every work citing work_id.
+
+    Cursor paging needs an API key past the first page (OpenAlex returns 401
+    without one). Without a key, page-number paging still works up to 10,000
+    results -- far beyond any model here -- so use that, and dedupe by id in
+    case the result set shifts between pages.
+    """
+    params = {
+        "filter": "cites:{}".format(work_id),
+        "per-page": config.OPENALEX_PER_PAGE,
+        "select": SELECT,
+        "mailto": config.OPENALEX_MAILTO,
+    }
     out = []
-    cursor = "*"
-    while cursor:
-        page = get("{}/works".format(config.OPENALEX_BASE), {
-            "filter": "cites:{}".format(work_id),
-            "per-page": config.OPENALEX_PER_PAGE,
-            "cursor": cursor,
-            "select": SELECT,
-            "mailto": config.OPENALEX_MAILTO,
-        })
-        out.extend(page.get("results", []))
-        cursor = page.get("meta", {}).get("next_cursor")
+    if config.OPENALEX_API_KEY:
+        params["api_key"] = config.OPENALEX_API_KEY
+        cursor = "*"
+        while cursor:
+            page = get("{}/works".format(config.OPENALEX_BASE),
+                       dict(params, cursor=cursor))
+            out.extend(page.get("results", []))
+            cursor = page.get("meta", {}).get("next_cursor")
+            time.sleep(config.OPENALEX_DELAY)
+        return out
+
+    seen = set()
+    n = 1
+    while True:
+        page = get("{}/works".format(config.OPENALEX_BASE), dict(params, page=n))
+        results = page.get("results", [])
+        for w in results:
+            if w.get("id") not in seen:
+                seen.add(w.get("id"))
+                out.append(w)
         time.sleep(config.OPENALEX_DELAY)
-    return out
+        total = page.get("meta", {}).get("count") or 0
+        if not results or n * config.OPENALEX_PER_PAGE >= total:
+            return out
+        n += 1
 
 
 def slim(work):

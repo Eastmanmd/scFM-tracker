@@ -12,6 +12,9 @@ REGISTRY_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "regist
 # A mailto puts us in the polite pool (faster, more reliable).
 OPENALEX_BASE = "https://api.openalex.org"
 OPENALEX_MAILTO = os.environ.get("OPENALEX_MAILTO", "allysons703@gmail.com")
+# Optional. OpenAlex now refuses cursor paging past page one without a key
+# (HTTP 401); with no key, fetch_openalex.py falls back to page-number paging.
+OPENALEX_API_KEY = os.environ.get("OPENALEX_API_KEY", "")
 OPENALEX_DELAY = 0.3
 OPENALEX_PER_PAGE = 200
 

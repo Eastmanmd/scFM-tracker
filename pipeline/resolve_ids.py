@@ -163,8 +163,9 @@ def main():
                 work, score = openalex_search(paper["title"])
             time.sleep(config.OPENALEX_DELAY)
             if work is None or score < WEAK_MATCH:
-                print("  paper   MISSING  {!r}".format(paper["title"][:70]))
-                problems.append((mid, "paper not found: " + paper["title"]))
+                label = paper.get("title") or paper["openalex_id"]
+                print("  paper   MISSING  {!r}".format(label[:70]))
+                problems.append((mid, "paper not found: " + label))
                 continue
             flag = "ok  " if score >= STRONG_MATCH else "WEAK"
             work_id = work["id"].rsplit("/", 1)[-1]

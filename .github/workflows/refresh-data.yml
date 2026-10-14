@@ -34,6 +34,8 @@ jobs:
           # Raises the GitHub API limit from 60/hr to 5000/hr.
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENALEX_MAILTO: ${{ vars.OPENALEX_MAILTO }}
+          # Optional: enables cursor paging; without it the pipeline pages by number.
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python pipeline/run_all.py
 
       - name: Commit updated data
