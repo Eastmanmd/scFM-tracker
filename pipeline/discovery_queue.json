@@ -20,6 +20,126 @@
  "schema": 1,
  "candidates": [
   {
+   "key": "10.64898/2026.10.12.758490",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.12.758490",
+   "url": "https://doi.org/10.64898/2026.10.12.758490",
+   "title": "BioMod: Biological Module Tokenization for Single-Cell Foundation Modeling",
+   "abstract": "Single-cell foundation models typically represent cells as flat sequences of individual genes, requiring higher-order biological organization to be inferred implicitly from sparse expression profiles. Similar to the evolution from character-level to semantic tokenization in natural language processing,we hypothesize that cellular states can be more efficiently represented using biologically meaningful intermediate units. Here we present BioMod, a 50-million-parameter single-cell foundation model that introduces biological modules as representation units between genes and cells. BioMod construc",
+   "date": "2026-10-13",
+   "authors": "Meng, L.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "BioMod",
+   "first_seen": "2026-10-14",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.06.756877",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.06.756877",
+   "url": "https://doi.org/10.64898/2026.10.06.756877",
+   "title": "VirtualSkin integrates skin-cell identity with intervention-response prediction",
+   "abstract": "Human skin atlases resolve a diverse set of cellular states, yet connecting these states to their responses to intervention remains difficult across independently sampled tissues. Here we present VirtualSkin, a cell language model that aligns skin transcriptomes with biological descriptions and supports intervention conditioned response prediction. We evaluated the model across independent atlas, disease, anatomical and perturbation cohorts, with donors, studies and perturbations withheld according to the experimental design. VirtualSkin improved inflammatory skin annotation by 0.056 macro F1 ",
+   "date": "2026-10-13",
+   "authors": "Velland, M.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "cell language model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "VirtualSkin",
+   "first_seen": "2026-10-14",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.12.758421",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.12.758421",
+   "url": "https://doi.org/10.64898/2026.10.12.758421",
+   "title": "Benchmarking single-cell foundation models reveals an advantage in the low-data regime for cell-type and disease-state prediction",
+   "abstract": "Single-cell foundation models perform well on cell-type classification, but their value for disease-state prediction and their advantage over classical representations remains unclear. We benchmarked cell-representations from four foundation models using logistic regression, on 868 disease-prediction tasks (82 datasets) and 65 cell-type datasets from CELLxGENE. With full data, the baseline (log-normalized counts) outperformed the best model (TranscriptFormer-Sapiens) for cell type and matched it for disease. However, with few labeled cells, TranscriptFormer-Sapiens significantly outperformed t",
+   "date": "2026-10-12",
+   "authors": "Benhayon, H.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-10-14",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.05.756880",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.05.756880",
+   "url": "https://doi.org/10.64898/2026.10.05.756880",
+   "title": "Beyond the Final Layer: Evaluating Single-Cell Foundation Model Representations for Molecular Prediction",
+   "abstract": "Single-cell foundation models (scFMs) are commonly benchmarked using final-layer embeddings, although useful depth may depend on the task. We evaluate Geneformer, scBERT, scGPT, and scFoundation as frozen feature extractors for cell-type and perturbation-response prediction using layer-wise probes, leave-one-dataset-out (LODO) selection, readout controls, representation diagnostics, centered kernel alignment (CKA), and retrieval/collapse analyses. Intermediate layers significantly improve cell-type accuracy for scGPT and scBERT in several settings, while Geneformer and scFoundation generally s",
+   "date": "2026-10-12",
+   "authors": "Wen, M.-C. C.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-10-14",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.02.756356",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.02.756356",
+   "url": "https://doi.org/10.64898/2026.10.02.756356",
+   "title": "DECONVersation: Single Cell Foundation Model-Derived Embeddings for Robust Cell Type Deconvolution of Bulk RNA-seq",
+   "abstract": "AI and deep learning have transformed single-cell transcriptomics, empowering unsupervised annotation, trajectory inference, and cross-dataset integration at scale. Here, we propose bulk RNA-seq deconvolution as a novel task for single-cell foundation models. Deconvolution estimates cell type proportions from bulk RNA-seq using single-cell reference data, with applications spanning tumor microenvironment profiling to the detection of disease-associated shifts in tissue composition. However, existing methods remain vulnerable to batch effects, subject-level variation, and marker gene selection ",
+   "date": "2026-10-09",
+   "authors": "Oku, A.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "DECONVersation",
+   "first_seen": "2026-10-14",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "arxiv:2610.08544",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2610.08544v1",
+   "title": "How High Is 0.6? Floors, Ceilings, and Headroom in Interpretability Probing",
+   "abstract": "Probes are the workhorse of interpretability. If a model's hidden states predict a variable, the model is said to represent it. But a probe score has no fixed meaning. An $R^2$ of 0.6 may only reflect what the input already gives away, and the same score can mean different things on different data. We propose reading every probe score against two reference points: a floor, what a declared set of simple inputs already predicts, and a ceiling, what the full input can predict. The gap between them, the headroom, is the range in which a probe can show that a model computes something beyond the sim",
+   "date": "2026-10-06",
+   "authors": "Pranjal Garg",
+   "category": "cs.CL",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-10-14",
+   "status": "new",
+   "schema": 1
+  },
+  {
    "key": "arxiv:2609.38908",
    "source": "arxiv",
    "doi": null,
@@ -321,8 +441,8 @@
    "schema": 1
   }
  ],
- "updated": "2026-10-05",
+ "updated": "2026-10-14",
  "counts": {
-  "new": 15
+  "new": 21
  }
 }
