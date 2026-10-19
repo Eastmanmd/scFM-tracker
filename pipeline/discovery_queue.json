@@ -20,6 +20,46 @@
  "schema": 1,
  "candidates": [
   {
+   "key": "10.64898/2026.06.04.730272",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.06.04.730272",
+   "url": "https://doi.org/10.64898/2026.06.04.730272",
+   "title": "Re-evaluating the benefit of pretraining scale in cell foundation models",
+   "abstract": "Single-cell foundation models are self-supervised neural networks pretrained on millions of cellular transcriptomes to learn representations that transfer across biological domains and downstream tasks. Recent benchmarks have questioned the training data scaling law for these models, showing early finetuning performance saturation on a fraction of available pretraining data. However, whether this trend holds for larger second-generation foundation models, and whether it reflects genuine saturation of foundation representations remains unclear. To resolve these aspects, we tested the performanc",
+   "date": "2026-10-18",
+   "authors": "Shakeel, M. H.",
+   "category": "bioinformatics",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-10-19",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.07.757352",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.07.757352",
+   "url": "https://doi.org/10.64898/2026.10.07.757352",
+   "title": "From Closed-Set Annotation to In-Context Discovery: Biologically Grounded LLMs for Cellular Profiling",
+   "abstract": "Tumour heterogeneity reflects both cellular identity (lineage) and state (active transcriptional programs), yet computational methods generally analyse these axes separately. We introduce CellScribe, a generative framework that conditions a pretrained language model on frozen single cell foundation model embeddings through AdaLN adapters, enabling one shared model to generate an ontology- grounded cell type or a quantified meta-program profile. Supervised multitask fine- tuning produces fine grained typing across hundreds of cell types and outperforms generative and retrieval baselines on meta",
+   "date": "2026-10-14",
+   "authors": "Gelard, M.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "CellScribe",
+   "first_seen": "2026-10-19",
+   "status": "new",
+   "schema": 1
+  },
+  {
    "key": "10.64898/2026.10.12.758490",
    "source": "biorxiv",
    "doi": "10.64898/2026.10.12.758490",
@@ -441,8 +481,8 @@
    "schema": 1
   }
  ],
- "updated": "2026-10-14",
+ "updated": "2026-10-19",
  "counts": {
-  "new": 21
+  "new": 23
  }
 }

@@ -224,6 +224,49 @@
      ]
     }
    ]
+  },
+  {
+   "date": "2026-10-19",
+   "events": [
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cArtificial intelligence (AI)\u2010enabled RNA therapeutic design: from molecular optimization to system\u2010level evaluation\u201d (British Journal of Pharmacology) \u2014 covers scGPT, Geneformer.",
+     "models": [
+      "scgpt",
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.1111/bph.70712"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBenchmarking single-cell format conversion tools reveals interoperability gaps and introduces CrossCell for reliable cross-ecosystem data exchange\u201d (BMC Genomics) \u2014 covers scGPT, Geneformer.",
+     "models": [
+      "scgpt",
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.1186/s12864-026-13198-5"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cHow do Large Language Models understand Genes and Cells\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers Cell2Sentence / C2S-Scale.",
+     "models": [
+      "cell2sentence"
+     ],
+     "url": "https://doi.org/10.1101/2024.03.23.586383"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cEvaluating the Utilities of Foundation Models in Single-cell Data Analysis\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers CellPLM.",
+     "models": [
+      "cellplm"
+     ],
+     "url": "https://doi.org/10.1101/2023.09.08.555192"
+    },
+    {
+     "type": "citing",
+     "text": "53 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }
