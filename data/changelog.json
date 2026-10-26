@@ -267,6 +267,33 @@
      "text": "53 other citing papers newly indexed, none of them evaluations."
     }
    ]
+  },
+  {
+   "date": "2026-10-26",
+   "events": [
+    {
+     "type": "upkeep",
+     "text": "STATE's repository has slowed \u2014 no commit in over 90 days.",
+     "models": [
+      "state"
+     ]
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cDemographic Bias in Single-Cell Foundation Models: Evaluation and Mitigation Across Models and Cohorts\u201d (ACM International Conference on Bioinformatics, Computational Biology, and Health Informatics (ACM-BCB)) \u2014 covers scGPT, Geneformer, scFoundation, CellFM.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scfoundation",
+      "cellfm"
+     ],
+     "url": "https://doi.org/10.1145/3807502.3833077"
+    },
+    {
+     "type": "citing",
+     "text": "18 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }

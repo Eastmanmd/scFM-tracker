@@ -24,18 +24,58 @@
    "source": "biorxiv",
    "doi": "10.64898/2026.06.04.730272",
    "url": "https://doi.org/10.64898/2026.06.04.730272",
-   "title": "Re-evaluating the benefit of pretraining scale in cell foundation models",
-   "abstract": "Single-cell foundation models are self-supervised neural networks pretrained on millions of cellular transcriptomes to learn representations that transfer across biological domains and downstream tasks. Recent benchmarks have questioned the training data scaling law for these models, showing early finetuning performance saturation on a fraction of available pretraining data. However, whether this trend holds for larger second-generation foundation models, and whether it reflects genuine saturation of foundation representations remains unclear. To resolve these aspects, we tested the performanc",
-   "date": "2026-10-18",
+   "title": "Re-evaluating the benefit of training scale in cell foundation models",
+   "abstract": "Single-cell foundation models are self-supervised neural networks pretrained on millions of cellular transcriptomes to learn representations that transfer across biological domains and downstream tasks. Despite increasing investments in model and pretraining data scale, it remains unclear how to assess whether these investments improve the quality of learned biological representations. Recent evidence from standard finetuning benchmarks suggests that cell foundation models reach performance saturation after exposure to only a fraction of the available pretraining data. We hypothesised that con",
+   "date": "2026-10-22",
    "authors": "Shakeel, M. H.",
    "category": "bioinformatics",
-   "version": "2",
+   "version": "3",
    "matched_terms": [
     "single cell foundation model"
    ],
    "matches_tracked_model": [],
    "guessed_name": null,
    "first_seen": "2026-10-19",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.19.760026",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.19.760026",
+   "url": "https://doi.org/10.64898/2026.10.19.760026",
+   "title": "Predicting cell-state-specific gene regulation from DNA across species",
+   "abstract": "DNA encodes the cell's phenotype, but the same DNA sequence is interpreted differently in every cell type, developmental stage, and activity state. Existing deep-learning models solve only half of this puzzle: sequence-to-function models read DNA but treat cell state as a fixed label, while single-cell foundation models represent cell state but not sequence. We developed Bolero, a sequence-to-function model whose parameters condition on atlas-scale cell-state embeddings and additional biological variables to predict cell-state-specific chromatin accessibility and transcript abundance from DNA.",
+   "date": "2026-10-20",
+   "authors": "Liu, H.",
+   "category": "genomics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-10-26",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.16.759604",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.16.759604",
+   "url": "https://doi.org/10.64898/2026.10.16.759604",
+   "title": "Genetic Perturbation Prediction Models Fail Out-of-Distribution: A Rigorous Benchmark and Systematic Evaluation",
+   "abstract": "Perturbation prediction models - which forecast transcriptional responses to gene inactivation - are increasingly proposed as in silico surrogates for genome-scale drug discovery screens. Yet, rigorous evaluation of whether these models genuinely generalize beyond their training distribution has been lacking. Existing benchmarks rely predominantly on random train-test splits, obscuring systematic failure modes that only emerge under realistic out-of-distribution (OOD) conditions. Here we introduce EL-PERTURB (Extrapolative Learning for PERTURBation Prediction), a benchmarking framework that st",
+   "date": "2026-10-19",
+   "authors": "Tiwari, K.",
+   "category": "systems biology",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "EL-PERTURB",
+   "first_seen": "2026-10-26",
    "status": "new",
    "schema": 1
   },
@@ -481,8 +521,8 @@
    "schema": 1
   }
  ],
- "updated": "2026-10-19",
+ "updated": "2026-10-26",
  "counts": {
-  "new": 23
+  "new": 25
  }
 }
