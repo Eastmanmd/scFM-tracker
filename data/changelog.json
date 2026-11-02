@@ -294,6 +294,24 @@
      "text": "18 other citing papers newly indexed, none of them evaluations."
     }
    ]
+  },
+  {
+   "date": "2026-11-02",
+   "events": [
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cExplainable AI for Network Pharmacology: A Critical Framework for Interpreting Multi-Target Drug Discovery on Biological Graphs\u201d (International Journal of Molecular Sciences) \u2014 covers scGPT, Geneformer.",
+     "models": [
+      "scgpt",
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.3390/ijms27219479"
+    },
+    {
+     "type": "citing",
+     "text": "37 other citing papers newly indexed, none of them evaluations."
+    }
+   ]
   }
  ]
 }

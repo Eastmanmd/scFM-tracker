@@ -20,6 +20,86 @@
  "schema": 1,
  "candidates": [
   {
+   "key": "10.64898/2026.10.28.762457",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.28.762457",
+   "url": "https://doi.org/10.64898/2026.10.28.762457",
+   "title": "Single-cell foundation models transfer across deep evolutionary distances",
+   "abstract": "Single-cell foundation models are trained mostly on human and other vertebrate cells, yet are proposed as general-purpose models. Whether they transfer far beyond their training species is unknown. We evaluated zero-shot embeddings from Geneformer, scGPT and UCE against PCA and scVI in developmental atlases of Dictyostelium discoideum and Caenorhabditis elegans, separated from humans by 1.2 billion and 600 million years. Without retraining, the models recovered developmental order and preserved organism-specific cell identities. UCE encodes genes by protein sequence and could use 97% of measur",
+   "date": "2026-10-31",
+   "authors": "Trnovec, L.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-11-02",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "arxiv:2610.41399",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2610.41399v1",
+   "title": "scAnyOmics: Foundation-Model Distillation for Any-to-Any Completion of Multi-omics Virtual Cells",
+   "abstract": "Recent advances in single-cell technologies have enabled the profiling of multiple molecular modalities, including transcriptomics, proteomics, and chromatin accessibility, providing a more comprehensive understanding of cellular states. However, integrating heterogeneous modalities and predicting missing molecular information remain challenging, particularly when paired measurements are limited. Here, we introduce scAnyOmics, a generative framework that distills knowledge from a frozen single-cell foundation model into a multimodal student model. scAnyOmics integrates scRNA-seq, protein-marke",
+   "date": "2026-10-30",
+   "authors": "Zhaoqi Song",
+   "category": "cs.AI",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "scAnyOmics",
+   "first_seen": "2026-11-02",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.22.760932",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.22.760932",
+   "url": "https://doi.org/10.64898/2026.10.22.760932",
+   "title": "ProtCell: a foundation model for single-cell proteomics",
+   "abstract": "Single-cell proteomics provides a direct functional readout of cellular states, but targeted assays measure limited and non-identical protein panels, fragmenting information across experiments. Here, we present ProtCell, a foundation model developed using approximately 380 million cells from 98 datasets for pretraining and evaluation. ProtCell combines protein-identity and continuous-abundance embeddings in a transformer encoder and learns cell- and protein-level representations through masked abundance modeling. ProtCell first connects fragmented profiles through transferable annotation and b",
+   "date": "2026-10-27",
+   "authors": "Hu, B.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "foundation model for single cell"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "ProtCell",
+   "first_seen": "2026-11-02",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.21.760716",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.21.760716",
+   "url": "https://doi.org/10.64898/2026.10.21.760716",
+   "title": "Prediction transfer does not imply reliability transfer in single-cell foundation models",
+   "abstract": "Single-cell foundation models are increasingly transferred across tissues, diseases, perturbation screens, and experimental platforms. Although substantial effort has focused on prediction transfer, it remains unclear whether a model's assessment of its own reliability transfers similarly across biological contexts. Here we define reliability transfer as the ability to transfer an accurate assessment of when model predictions are likely to be correct or incorrect and investigate its behavior across ten perturbation-prediction systems spanning multiple datasets, models, and evaluation settings.",
+   "date": "2026-10-26",
+   "authors": "Park, H. J.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-11-02",
+   "status": "new",
+   "schema": 1
+  },
+  {
    "key": "10.64898/2026.06.04.730272",
    "source": "biorxiv",
    "doi": "10.64898/2026.06.04.730272",
@@ -521,8 +601,8 @@
    "schema": 1
   }
  ],
- "updated": "2026-10-26",
+ "updated": "2026-11-02",
  "counts": {
-  "new": 25
+  "new": 29
  }
 }
