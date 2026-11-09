@@ -20,6 +20,106 @@
  "schema": 1,
  "candidates": [
   {
+   "key": "10.64898/2026.11.03.763968",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.11.03.763968",
+   "url": "https://doi.org/10.64898/2026.11.03.763968",
+   "title": "Where single-cell foundation models help: a benchmark of annotation, perturbation and regulatory inference against simple baselines",
+   "abstract": "Single-cell foundation models (FMs) are proposed as general tools for cell-type annotation, in silico perturbation and gene-regulatory-network (GRN) inference. To identify where they add value, we benchmarked five FMs (scGPT, Geneformer V1 and V2, Nicheformer, scFoundation), CellOracle, supervised perturbation models including STATE, and task-matched simple baselines on the same data, from K562 Perturb-seq screens and primary cells to healthy-donor and isogenic leukodystrophy brain organoids, a public organoid CRISPR screen and lung cancer biopsies. FMs were most useful when labels had to be t",
+   "date": "2026-11-04",
+   "authors": "Cupaioli, F. A.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-11-09",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.24.761590",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.24.761590",
+   "url": "https://doi.org/10.64898/2026.10.24.761590",
+   "title": "scRM: A single-cell foundation model trained on scRNA-seq reads",
+   "abstract": "To our knowledge, scRM is the first single-cell foundation model trained on sequencing reads, demonstrating that raw data pretraining is not only feasible but competitive at a fraction of the computational cost. We anticipate that scaling this framework and exploring alternative architectures will unlock biological information inaccessible to count models and extend the dataset-specific pretraining it already makes possible. The source code is available at https://github.com/altoslabs/scRM.",
+   "date": "2026-11-03",
+   "authors": "He, D.",
+   "category": "bioinformatics",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "scRM",
+   "first_seen": "2026-11-09",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.08.06.743174",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.08.06.743174",
+   "url": "https://doi.org/10.64898/2026.08.06.743174",
+   "title": "AdaGeneBudget: Cell-Adaptive Gene-Token Allocation for Efficient Single-Cell Foundation Models",
+   "abstract": "Single-cell foundation models (scFMs) represent each cell using sequences of gene-associated tokens, making embedding extraction increasingly costly as the number of cells and expressed genes grows. Existing input policies typically rely on fixed input budgets, with retained genes determined by random subsampling, model-native ranking, or a dataset-level highly variable gene (HVG) panel. However, they do not jointly determine, for each cell, which genes to retain and how many tokens to allocate. We introduce AdaGeneBudget, a training-free gene-token selection method that combines each gene's e",
+   "date": "2026-11-03",
+   "authors": "Kim, D.",
+   "category": "bioinformatics",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "AdaGeneBudget",
+   "first_seen": "2026-11-09",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "arxiv:2611.02335",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2611.02335v2",
+   "title": "Attribution-based diagnostics for single-cell foundation models",
+   "abstract": "Single-cell RNA foundation models (scFMs) are increasingly used for in-silico biological discovery, yet predictive performance alone does not reveal whether their decisions rely on biologically meaningful signals or model-specific shortcuts. We systematically investigate post-hoc attribution of downstream predictions across two tasks: cell-type annotation using pretrained Cell2Sentence and scGPT models, and perturbation prediction using scGPT+STATE in a controlled setting. For cell annotation, we use attribution to assess whether predictions rely on established marker genes and how their relev",
+   "date": "2026-11-02",
+   "authors": "Farnoush Rezaei Jafari",
+   "category": "cs.LG",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-11-09",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.28.762297",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.28.762297",
+   "url": "https://doi.org/10.64898/2026.10.28.762297",
+   "title": "A single-cell multimodal foundation model enables cross modality analysis between transcriptome and chromatin",
+   "abstract": "Most single-cell studies measure either gene expression or chromatin accessibility, and connecting the two usually requires fitting a model to each study. Here we present MUTUAL (MUltiome Transfer in a Unified Aligned Latent space), which keeps the single-cell foundation models scFoundation and EpiAgent frozen, combines their embeddings with linear summaries of each modality and learns a shared RNA--ATAC space from 3.0 million paired cells of 400 public multiome datasets. Applied without refitting to ten datasets not used for training, MUTUAL matched cells' RNA and ATAC profiles more accuratel",
+   "date": "2026-11-02",
+   "authors": "Bao, X.",
+   "category": "bioinformatics",
+   "version": "1",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "MUTUAL",
+   "first_seen": "2026-11-09",
+   "status": "new",
+   "schema": 1
+  },
+  {
    "key": "10.64898/2026.10.28.762457",
    "source": "biorxiv",
    "doi": "10.64898/2026.10.28.762457",
@@ -116,6 +216,26 @@
    "matches_tracked_model": [],
    "guessed_name": null,
    "first_seen": "2026-10-19",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "arxiv:2611.05410",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2611.05410v1",
+   "title": "Rethinking One Gene, One Token: Transcriptome-Aware Tokenization for Single-Cell Foundation Models",
+   "abstract": "Single-cell foundation models typically treat each gene as a token, which is both costly and wasteful. A cell can express thousands of genes, so one token per gene makes self-attention expensive, yet many of these genes are detected at low levels and carry too little signal to deserve a token of their own. Genes that are expressed together could instead share a token, leaving separate tokens for genes that stand out. We introduce scTAT (Transcriptome-Aware Tokenization), which pairs a gene-set vocabulary with a per-cell tokenizer. The vocabulary holds overlapping gene sets that recur with stab",
+   "date": "2026-10-21",
+   "authors": "Jiaqi Xiong",
+   "category": "q-bio.GN",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "scTAT",
+   "first_seen": "2026-11-09",
    "status": "new",
    "schema": 1
   },
@@ -601,8 +721,8 @@
    "schema": 1
   }
  ],
- "updated": "2026-11-02",
+ "updated": "2026-11-09",
  "counts": {
-  "new": 29
+  "new": 35
  }
 }

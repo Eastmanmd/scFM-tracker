@@ -312,6 +312,259 @@
      "text": "37 other citing papers newly indexed, none of them evaluations."
     }
    ]
+  },
+  {
+   "date": "2026-11-09",
+   "events": [
+    {
+     "type": "rank_move",
+     "text": "SCimilarity climbs 8 places to #7 (score 60.8, +20.3).",
+     "models": [
+      "scimilarity"
+     ]
+    },
+    {
+     "type": "rank_move",
+     "text": "GeneCompass falls 2 places to #10 (score 54.7, -0.8).",
+     "models": [
+      "genecompass"
+     ]
+    },
+    {
+     "type": "upkeep",
+     "text": "TranscriptFormer's repository has gone dormant \u2014 no commit in over a year.",
+     "models": [
+      "transcriptformer"
+     ]
+    },
+    {
+     "type": "milestone",
+     "text": "STATE passes 100 citations.",
+     "models": [
+      "state"
+     ]
+    },
+    {
+     "type": "milestone",
+     "text": "SCimilarity passes 100 citations.",
+     "models": [
+      "scimilarity"
+     ]
+    },
+    {
+     "type": "milestone",
+     "text": "CellFM passes 100 citations.",
+     "models": [
+      "cellfm"
+     ]
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cPlate design confounds donor variation and model evaluation in single-cell perturbation screens\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers STATE.",
+     "models": [
+      "state"
+     ],
+     "url": "https://doi.org/10.64898/2026.11.04.764088"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cAn accuracy and calibration benchmark of scGPT pipelines and matched classical models for cell type annotation\u201d (Scientific Reports) \u2014 covers scGPT, Geneformer, scBERT, scFoundation, UCE (Universal Cell Embeddings).",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scbert",
+      "scfoundation",
+      "uce"
+     ],
+     "url": "https://doi.org/10.1038/s41598-026-77853-3"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cWhere single-cell foundation models help: a benchmark of annotation, perturbation and regulatory inference against simple baselines\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, scFoundation, Nicheformer, STATE.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scfoundation",
+      "nicheformer",
+      "state"
+     ],
+     "url": "https://doi.org/10.64898/2026.11.03.763968"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cSilent methodological failures in AI-assisted science: benchmarking large language model agents for virtual gene knockout analysis\u201d (Research Square) \u2014 covers Geneformer.",
+     "models": [
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.21203/rs.3.rs-11399586/v1"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cTop2All: Benchmarking sparse-to-transcriptome reconstruction from high-expression profiles across sex- and sex-steroid-defined conditions\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer.",
+     "models": [
+      "scgpt",
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.31.763361"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cDo Language Models Know What Compelling Scientific Evidence Looks Like?\u201d (arXiv (Cornell University)) \u2014 covers scGPT, Geneformer, STATE.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "state"
+     ],
+     "url": "https://doi.org/10.48550/arxiv.2610.41015"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cAveraging in gene perturbation benchmarks hides perturbation-strength variation: Consequences for model evaluation\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers STATE.",
+     "models": [
+      "state"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.20.760537"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cGenetic Perturbation Prediction Models Fail Out-of-Distribution: A Rigorous Benchmark and Systematic Evaluation\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers STATE.",
+     "models": [
+      "state"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.16.759604"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cA Pitfall in the Evaluation of Gene Perturbation Models\u201d (arXiv (Cornell University)) \u2014 covers STATE.",
+     "models": [
+      "state"
+     ],
+     "url": "https://doi.org/10.48550/arxiv.2610.26267"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cSubcellPert: Benchmarking Subcellular Perturbation Prediction\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, scFoundation, STATE.",
+     "models": [
+      "scgpt",
+      "scfoundation",
+      "state"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.11.758305"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBeyond the Final Layer: Evaluating Single-Cell Foundation Model Representations for Molecular Prediction\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, scFoundation.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scfoundation"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.05.756880"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBenchmarking single-cell foundation models for aging biology\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, scFoundation, UCE (Universal Cell Embeddings), SCimilarity, CellFM, scPRINT, TranscriptFormer.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scfoundation",
+      "uce",
+      "scimilarity",
+      "cellfm",
+      "scprint",
+      "transcriptformer"
+     ],
+     "url": "https://doi.org/10.64898/2026.09.21.753191"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u2026and 43 further benchmarking papers."
+    },
+    {
+     "type": "citing",
+     "text": "478 other citing papers newly indexed, none of them evaluations."
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of CellPLM and scMulan.",
+     "models": [
+      "cellplm",
+      "scmulan"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of Geneformer and scMulan.",
+     "models": [
+      "geneformer",
+      "scmulan"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of Nicheformer and tGPT.",
+     "models": [
+      "nicheformer",
+      "tgpt"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of scBERT and scMulan.",
+     "models": [
+      "scbert",
+      "scmulan"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of SCimilarity and scPRINT.",
+     "models": [
+      "scimilarity",
+      "scprint"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of SCimilarity and STATE.",
+     "models": [
+      "scimilarity",
+      "state"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of SCimilarity and TranscriptFormer.",
+     "models": [
+      "scimilarity",
+      "transcriptformer"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of scMulan and tGPT.",
+     "models": [
+      "scmulan",
+      "tgpt"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of scPRINT and STATE.",
+     "models": [
+      "scprint",
+      "state"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of scPRINT and tGPT.",
+     "models": [
+      "scprint",
+      "tgpt"
+     ]
+    }
+   ]
   }
  ]
 }
