@@ -20,22 +20,102 @@
  "schema": 1,
  "candidates": [
   {
-   "key": "10.64898/2026.11.03.763968",
+   "key": "10.64898/2026.11.08.765157",
    "source": "biorxiv",
-   "doi": "10.64898/2026.11.03.763968",
-   "url": "https://doi.org/10.64898/2026.11.03.763968",
-   "title": "Where single-cell foundation models help: a benchmark of annotation, perturbation and regulatory inference against simple baselines",
-   "abstract": "Single-cell foundation models (FMs) are proposed as general tools for cell-type annotation, in silico perturbation and gene-regulatory-network (GRN) inference. To identify where they add value, we benchmarked five FMs (scGPT, Geneformer V1 and V2, Nicheformer, scFoundation), CellOracle, supervised perturbation models including STATE, and task-matched simple baselines on the same data, from K562 Perturb-seq screens and primary cells to healthy-donor and isogenic leukodystrophy brain organoids, a public organoid CRISPR screen and lung cancer biopsies. FMs were most useful when labels had to be t",
-   "date": "2026-11-04",
-   "authors": "Cupaioli, F. A.",
+   "doi": "10.64898/2026.11.08.765157",
+   "url": "https://doi.org/10.64898/2026.11.08.765157",
+   "title": "LingoCell interprets gene perturbations through natural language and tissue niches",
+   "abstract": "Single-cell foundation models are general tools for resolving cell identities and disease states, but struggle to interpret changes in expression magnitude in biological language, to transfer to sparse spatial measurements, and to explain cellular niches. We introduce LingoCell, a foundation model connecting single-cell and spatial transcriptomics. It aligns cell representations with language while keeping gene expression editable, supporting cell annotation, cross-batch integration, description generation, and disease-language readouts of single-gene and combinatorial in silico perturbations.",
+   "date": "2026-11-10",
+   "authors": "Yang, Y.",
    "category": "bioinformatics",
    "version": "1",
    "matched_terms": [
     "single cell foundation model"
    ],
    "matches_tracked_model": [],
+   "guessed_name": "LingoCell",
+   "first_seen": "2026-11-16",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.11.03.763968",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.11.03.763968",
+   "url": "https://doi.org/10.64898/2026.11.03.763968",
+   "title": "Where single-cell foundation models help: a benchmark of annotation, perturbation and regulatory inference against simple baselines",
+   "abstract": "Single-cell foundation models (FMs) are proposed as general tools for cell-type annotation, in silico perturbation and gene-regulatory-network (GRN) inference. To identify where they add value, we benchmarked five FMs (scGPT, Geneformer V1 and V2, Nicheformer, scFoundation), CellOracle, supervised perturbation models including STATE, and task-matched simple baselines on the same data, from K562 Perturb-seq screens and primary cells to healthy-donor and isogenic leukodystrophy brain organoids, a public organoid CRISPR screen and lung cancer biopsies. FMs were most useful when labels had to be t",
+   "date": "2026-11-10",
+   "authors": "Cupaioli, F. A.",
+   "category": "bioinformatics",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
    "guessed_name": null,
    "first_seen": "2026-11-09",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.10.02.756356",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.10.02.756356",
+   "url": "https://doi.org/10.64898/2026.10.02.756356",
+   "title": "DECONVersation: Single Cell Foundation Model-Derived Embeddings for Robust Cell Type Deconvolution of Bulk RNA-seq",
+   "abstract": "Motivation: Bulk RNA-seq deconvolution uses single-cell references to estimate cell type proportions in bulk tissue. Existing methods face challenges with batch effects, subject-level variation, and marker gene selection. We propose a new approach leveraging general-purpose single-cell foundation models. Results: DECONVersation combines pretrained or fine-tuned single-cell foundation model embeddings with non-negative least squares for deconvolution. The embeddings eliminate the need for explicit marker selection, and reduce batch effects. Compared against MuSiC, DWLS, and BayesPrism, DECONVer",
+   "date": "2026-11-10",
+   "authors": "Oku, A.",
+   "category": "bioinformatics",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": "DECONVersation",
+   "first_seen": "2026-10-14",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "10.64898/2026.02.11.705358",
+   "source": "biorxiv",
+   "doi": "10.64898/2026.02.11.705358",
+   "url": "https://doi.org/10.64898/2026.02.11.705358",
+   "title": "Simple models outperform single-cell foundation models on downstream benchmarks",
+   "abstract": "Single-cell RNA sequencing (scRNA-seq) data exhibit strong and reproducible statistical structure. This has motivated the development of large-scale foundation models, such as TranscriptFormer, that use transformer-based architectures to learn a generative model for gene expression by embedding genes into a latent vector space. These embeddings have been used to obtain state-of-the-art (SOTA) performance on downstream tasks such as cell-type classification, disease-state prediction, and cross-species learning. Here, we ask whether similar performance can be achieved without utilizing computati",
+   "date": "2026-11-10",
+   "authors": "Souza, H.",
+   "category": "bioinformatics",
+   "version": "2",
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-11-16",
+   "status": "new",
+   "schema": 1
+  },
+  {
+   "key": "arxiv:2611.10838",
+   "source": "arxiv",
+   "doi": null,
+   "url": "https://arxiv.org/abs/2611.10838v1",
+   "title": "Learning Biological Hierarchies in Single-Cell Foundation Models",
+   "abstract": "Cell types are organized by taxonomic relationships that define lineages in the so-called cell ontology. However, most existing foundation models typically ignore cell-type lineages encoded in this cell ontology. We introduce a biologically informed foundation model called scOntoFM, which embeds hierarchical cell ontology into representation learning. Using Lowest Common Ancestor (LCA) distances from the ontology graph, our framework pairs efficient offline triplet sampling with hierarchical cell-ontology learning. This approach jointly preserves local neighborhoods and shapes the global embed",
+   "date": "2026-11-07",
+   "authors": "Xiangyu Guo",
+   "category": "cs.LG",
+   "version": null,
+   "matched_terms": [
+    "single cell foundation model"
+   ],
+   "matches_tracked_model": [],
+   "guessed_name": null,
+   "first_seen": "2026-11-16",
    "status": "new",
    "schema": 1
   },
@@ -223,7 +303,7 @@
    "key": "arxiv:2611.05410",
    "source": "arxiv",
    "doi": null,
-   "url": "https://arxiv.org/abs/2611.05410v1",
+   "url": "https://arxiv.org/abs/2611.05410v2",
    "title": "Rethinking One Gene, One Token: Transcriptome-Aware Tokenization for Single-Cell Foundation Models",
    "abstract": "Single-cell foundation models typically treat each gene as a token, which is both costly and wasteful. A cell can express thousands of genes, so one token per gene makes self-attention expensive, yet many of these genes are detected at low levels and carry too little signal to deserve a token of their own. Genes that are expressed together could instead share a token, leaving separate tokens for genes that stand out. We introduce scTAT (Transcriptome-Aware Tokenization), which pairs a gene-set vocabulary with a per-cell tokenizer. The vocabulary holds overlapping gene sets that recur with stab",
    "date": "2026-10-21",
@@ -375,26 +455,6 @@
    ],
    "matches_tracked_model": [],
    "guessed_name": null,
-   "first_seen": "2026-10-14",
-   "status": "new",
-   "schema": 1
-  },
-  {
-   "key": "10.64898/2026.10.02.756356",
-   "source": "biorxiv",
-   "doi": "10.64898/2026.10.02.756356",
-   "url": "https://doi.org/10.64898/2026.10.02.756356",
-   "title": "DECONVersation: Single Cell Foundation Model-Derived Embeddings for Robust Cell Type Deconvolution of Bulk RNA-seq",
-   "abstract": "AI and deep learning have transformed single-cell transcriptomics, empowering unsupervised annotation, trajectory inference, and cross-dataset integration at scale. Here, we propose bulk RNA-seq deconvolution as a novel task for single-cell foundation models. Deconvolution estimates cell type proportions from bulk RNA-seq using single-cell reference data, with applications spanning tumor microenvironment profiling to the detection of disease-associated shifts in tissue composition. However, existing methods remain vulnerable to batch effects, subject-level variation, and marker gene selection ",
-   "date": "2026-10-09",
-   "authors": "Oku, A.",
-   "category": "bioinformatics",
-   "version": "1",
-   "matched_terms": [
-    "single cell foundation model"
-   ],
-   "matches_tracked_model": [],
-   "guessed_name": "DECONVersation",
    "first_seen": "2026-10-14",
    "status": "new",
    "schema": 1
@@ -721,8 +781,8 @@
    "schema": 1
   }
  ],
- "updated": "2026-11-09",
+ "updated": "2026-11-16",
  "counts": {
-  "new": 35
+  "new": 38
  }
 }

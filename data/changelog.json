@@ -565,6 +565,263 @@
      ]
     }
    ]
+  },
+  {
+   "date": "2026-11-16",
+   "events": [
+    {
+     "type": "upkeep",
+     "text": "scPRINT's repository has slowed \u2014 no commit in over 90 days.",
+     "models": [
+      "scprint"
+     ]
+    },
+    {
+     "type": "milestone",
+     "text": "UCE (Universal Cell Embeddings) passes 250 citations.",
+     "models": [
+      "uce"
+     ]
+    },
+    {
+     "type": "milestone",
+     "text": "Nicheformer passes 250 citations.",
+     "models": [
+      "nicheformer"
+     ]
+    },
+    {
+     "type": "milestone",
+     "text": "CellPLM passes 100 citations.",
+     "models": [
+      "cellplm"
+     ]
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cscDeepSim: Deep Generative Simulation for Controlled Benchmarking of Single-Cell Methods\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, scFoundation.",
+     "models": [
+      "scgpt",
+      "scfoundation"
+     ],
+     "url": "https://doi.org/10.64898/2026.11.09.765456"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cWhen gene summaries reveal the answers: Gene Ontology circularity in gene embedding benchmarks\u201d (arXiv (Cornell University)) \u2014 covers Geneformer, AIDO.Cell.",
+     "models": [
+      "geneformer",
+      "aido-cell"
+     ],
+     "url": "https://doi.org/10.48550/arxiv.2611.11118"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cGround-truth evaluation of sparse autoencoder features on spatial, single-cell and language-model embeddings\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers Geneformer.",
+     "models": [
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.27.762296"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cInformation contracts determine what inverse perturbation benchmarks measure\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, scFoundation, UCE (Universal Cell Embeddings).",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scfoundation",
+      "uce"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.19.760271"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cGenetic Perturbation Prediction Models Fail Out-of-Distribution: A Rigorous Benchmark and Systematic Evaluation\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer.",
+     "models": [
+      "scgpt",
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.16.759604"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBenchmarking single-cell foundation models reveals an advantage in the low-data regime for cell-type and disease-state prediction\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, TranscriptFormer.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "transcriptformer"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.12.758421"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBeyond the Final Layer: Evaluating Single-Cell Foundation Model Representations for Molecular Prediction\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scBERT.",
+     "models": [
+      "scbert"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.05.756880"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cCause-excluded Effect Evaluation: a framework for the faithful assessment of genetic perturbation target identification\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT.",
+     "models": [
+      "scgpt"
+     ],
+     "url": "https://doi.org/10.64898/2026.10.03.752923"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBeyond Accuracy: Benchmarking the Reproducibility and Robustness of Single-Cell Embeddings\u201d (Research Square) \u2014 covers scGPT, Geneformer.",
+     "models": [
+      "scgpt",
+      "geneformer"
+     ],
+     "url": "https://doi.org/10.21203/rs.3.rs-11109782/v1"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cCell-level random splits leak group-owned answers in single-cell benchmarks\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, scBERT, scFoundation.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scbert",
+      "scfoundation"
+     ],
+     "url": "https://doi.org/10.64898/2026.09.09.750484"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cBenchmarking cell type annotation in spatial transcriptomics: resolving cellular hierarchies, biological fidelity, and dynamic cell states\u201d (Research Square) \u2014 covers scGPT, Nicheformer.",
+     "models": [
+      "scgpt",
+      "nicheformer"
+     ],
+     "url": "https://doi.org/10.21203/rs.3.rs-10731867/v1"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u201cRobustness to nuisance perturbations enables unsupervised evaluation of single-cell foundation models\u201d (bioRxiv (Cold Spring Harbor Laboratory)) \u2014 covers scGPT, Geneformer, scFoundation, SCimilarity.",
+     "models": [
+      "scgpt",
+      "geneformer",
+      "scfoundation",
+      "scimilarity"
+     ],
+     "url": "https://doi.org/10.64898/2026.08.22.746357"
+    },
+    {
+     "type": "benchmark_paper",
+     "text": "\u2026and 37 further benchmarking papers."
+    },
+    {
+     "type": "citing",
+     "text": "446 other citing papers newly indexed, none of them evaluations."
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of CellFM and STATE.",
+     "models": [
+      "cellfm",
+      "state"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of CellPLM and LangCell.",
+     "models": [
+      "cellplm",
+      "langcell"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of GeneCompass and LangCell.",
+     "models": [
+      "genecompass",
+      "langcell"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of Geneformer and LangCell.",
+     "models": [
+      "geneformer",
+      "langcell"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and Nicheformer.",
+     "models": [
+      "langcell",
+      "nicheformer"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and scBERT.",
+     "models": [
+      "langcell",
+      "scbert"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and scFoundation.",
+     "models": [
+      "langcell",
+      "scfoundation"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and scGPT.",
+     "models": [
+      "langcell",
+      "scgpt"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and scMulan.",
+     "models": [
+      "langcell",
+      "scmulan"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and scPRINT.",
+     "models": [
+      "langcell",
+      "scprint"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and tGPT.",
+     "models": [
+      "langcell",
+      "tgpt"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of LangCell and UCE (Universal Cell Embeddings).",
+     "models": [
+      "langcell",
+      "uce"
+     ]
+    },
+    {
+     "type": "first_comparison",
+     "text": "First joint evaluation of SCimilarity and scMulan.",
+     "models": [
+      "scimilarity",
+      "scmulan"
+     ]
+    }
+   ]
   }
  ]
 }

@@ -3359,6 +3359,239 @@
      "runnable": 0.2
     }
    }
+  },
+  {
+   "date": "2026-11-16",
+   "models": {
+    "scgpt": {
+     "citations": 1819,
+     "stars": 1666,
+     "downloads": 0,
+     "biology_share": 0.101,
+     "rank": 1,
+     "score": 89.8,
+     "license": "MIT",
+     "upkeep": "slowing",
+     "benchmark": 140,
+     "runnable": 1.0
+    },
+    "geneformer": {
+     "citations": 1488,
+     "stars": 0,
+     "downloads": 1564,
+     "biology_share": 0.126,
+     "rank": 2,
+     "score": 84.6,
+     "license": "Apache-2.0",
+     "upkeep": "active",
+     "benchmark": 108,
+     "runnable": 0.6
+    },
+    "state": {
+     "citations": 200,
+     "stars": 746,
+     "downloads": 736,
+     "biology_share": 0.067,
+     "rank": 3,
+     "score": 73.3,
+     "license": "NOASSERTION",
+     "upkeep": "slowing",
+     "benchmark": 25,
+     "runnable": 0.85
+    },
+    "scfoundation": {
+     "citations": 849,
+     "stars": 433,
+     "downloads": 0,
+     "biology_share": 0.076,
+     "rank": 4,
+     "score": 71.3,
+     "license": "Apache-2.0",
+     "upkeep": "slowing",
+     "benchmark": 81,
+     "runnable": 0.15
+    },
+    "scbert": {
+     "citations": 735,
+     "stars": 363,
+     "downloads": 0,
+     "biology_share": 0.048,
+     "rank": 5,
+     "score": 67.4,
+     "license": "GPL-3.0",
+     "upkeep": "dormant",
+     "benchmark": 51,
+     "runnable": 0.35
+    },
+    "uce": {
+     "citations": 273,
+     "stars": 356,
+     "downloads": 0,
+     "biology_share": 0.066,
+     "rank": 6,
+     "score": 60.7,
+     "license": "MIT",
+     "upkeep": "slowing",
+     "benchmark": 33,
+     "runnable": 0.35
+    },
+    "scimilarity": {
+     "citations": 217,
+     "stars": 270,
+     "downloads": 0,
+     "biology_share": 0.194,
+     "rank": 7,
+     "score": 60.1,
+     "license": "NOASSERTION",
+     "upkeep": "slowing",
+     "benchmark": 18,
+     "runnable": 0.75
+    },
+    "nicheformer": {
+     "citations": 254,
+     "stars": 179,
+     "downloads": 0,
+     "biology_share": 0.135,
+     "rank": 8,
+     "score": 59.6,
+     "license": "BSD-3-Clause",
+     "upkeep": "slowing",
+     "benchmark": 21,
+     "runnable": 0.35
+    },
+    "cell2sentence": {
+     "citations": 93,
+     "stars": 896,
+     "downloads": 0,
+     "biology_share": 0.013,
+     "rank": 9,
+     "score": 55.8,
+     "license": "Apache-2.0",
+     "upkeep": "active",
+     "benchmark": 6,
+     "runnable": 0.75
+    },
+    "genecompass": {
+     "citations": 186,
+     "stars": 125,
+     "downloads": 0,
+     "biology_share": 0.065,
+     "rank": 10,
+     "score": 54.2,
+     "license": null,
+     "upkeep": "active",
+     "benchmark": 16,
+     "runnable": 0.35
+    },
+    "scprint": {
+     "citations": 89,
+     "stars": 164,
+     "downloads": 0,
+     "biology_share": 0.078,
+     "rank": 11,
+     "score": 51.5,
+     "license": "GPL-3.0",
+     "upkeep": "slowing",
+     "benchmark": 12,
+     "runnable": 0.75
+    },
+    "cellplm": {
+     "citations": 120,
+     "stars": 109,
+     "downloads": 0,
+     "biology_share": 0.0,
+     "rank": 12,
+     "score": 50.7,
+     "license": "BSD-2-Clause",
+     "upkeep": "dormant",
+     "benchmark": 14,
+     "runnable": 0.6
+    },
+    "cellfm": {
+     "citations": 129,
+     "stars": 117,
+     "downloads": 0,
+     "biology_share": 0.105,
+     "rank": 13,
+     "score": 49.9,
+     "license": "NOASSERTION",
+     "upkeep": "active",
+     "benchmark": 13,
+     "runnable": 0.15
+    },
+    "transcriptformer": {
+     "citations": 72,
+     "stars": 170,
+     "downloads": 0,
+     "biology_share": 0.095,
+     "rank": 14,
+     "score": 48.5,
+     "license": "MIT",
+     "upkeep": "dormant",
+     "benchmark": 9,
+     "runnable": 0.7
+    },
+    "aido-cell": {
+     "citations": 25,
+     "stars": 127,
+     "downloads": 232,
+     "biology_share": 0.0,
+     "rank": 15,
+     "score": 45.8,
+     "license": "NOASSERTION",
+     "upkeep": "active",
+     "benchmark": 4,
+     "runnable": 0.75
+    },
+    "scmulan": {
+     "citations": 51,
+     "stars": 64,
+     "downloads": 0,
+     "biology_share": 0.0,
+     "rank": 16,
+     "score": 37.9,
+     "license": "MIT",
+     "upkeep": "dormant",
+     "benchmark": 3,
+     "runnable": 0.3
+    },
+    "langcell": {
+     "citations": 36,
+     "stars": 70,
+     "downloads": 0,
+     "biology_share": 0.0,
+     "rank": 17,
+     "score": 33.7,
+     "license": "MIT",
+     "upkeep": "dormant",
+     "benchmark": 2,
+     "runnable": 0.25
+    },
+    "tgpt": {
+     "citations": 83,
+     "stars": 0,
+     "downloads": 0,
+     "biology_share": 0.056,
+     "rank": 18,
+     "score": 33.4,
+     "license": null,
+     "upkeep": "unknown",
+     "benchmark": 10,
+     "runnable": null
+    },
+    "cellhermes": {
+     "citations": 5,
+     "stars": 34,
+     "downloads": 24,
+     "biology_share": 0.0,
+     "rank": 19,
+     "score": 20.1,
+     "license": "GPL-3.0",
+     "upkeep": "slowing",
+     "benchmark": 0,
+     "runnable": 0.2
+    }
+   }
   }
  ]
 }
