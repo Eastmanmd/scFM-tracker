@@ -28,13 +28,14 @@
 <link rel="alternate" type="application/atom+xml" title="scFM Tracker — weekly changes" href="feed.xml">
 <link rel="stylesheet" href="styles.css">
 <script>
-  // Applied before first paint so a stored dark choice never flashes light.
+  // Apply the default before first paint, then honor a saved preference.
+  document.documentElement.setAttribute("data-theme", "dark");
   try {
     var saved = localStorage.getItem("scfm-theme");
     if (saved === "dark" || saved === "light") {
       document.documentElement.setAttribute("data-theme", saved);
     }
-  } catch (e) { /* private mode: fall back to the OS preference */ }
+  } catch (e) { /* private mode: keep the dark default */ }
 </script>
 </head>
 <body>
@@ -46,8 +47,7 @@
     </button>
     <div class="brand"><span class="brand-cell" aria-hidden="true"></span> scFM <strong>Tracker</strong></div>
     <h1>Single-Cell Foundation Model Tracker</h1>
-    <div class="header-field"><div><p class="eyebrow">THE SINGLE-CELL MODEL LANDSCAPE / WEEKLY INDEX</p>
-    <p class="header-caption">Attention · usage · upkeep</p></div>
+    <div class="header-field"><div><p class="header-caption">Explore and compare single-cell models in one place.</p></div>
     <div class="cell-cluster" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
     <p class="provenance" id="provenance"></p>
   </div>

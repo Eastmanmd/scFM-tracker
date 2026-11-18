@@ -32,6 +32,7 @@ var modelSearch = "", scoreOpen = false;
 var TASKS = ["annotation", "integration", "imputation", "perturbation", "grn", "spatial"];
 var h2hPair = null;   // "modelA|modelB" while a matrix cell is selected
 var logWeeks = 1;     // changelog weeks shown on the leaderboard card
+var citationTimelineTimer = null;
 
 /* ---------- helpers ---------- */
 function el(id) { return document.getElementById(id); }
@@ -100,7 +101,7 @@ function deltaTag(value, unit) {
 }
 
 /* ---------- theme toggle ----------
-   With no stored choice the page follows the OS. The first click stores an
+   With no stored choice the page starts in dark mode. The first click stores an
    explicit preference, which then wins in both directions. Charts read their
    colours from CSS custom properties, so nothing needs re-rendering. */
 
@@ -119,7 +120,7 @@ function systemTheme() {
     ? "dark" : "light";
 }
 function activeTheme() {
-  return document.documentElement.getAttribute("data-theme") || systemTheme();
+  return document.documentElement.getAttribute("data-theme") || "dark";
 }
 
 function paintToggle() {
@@ -285,7 +286,7 @@ function renderModels() {
   ];
 
   el("view-models").innerHTML =
-    '<div class="leader-heading"><p class="eyebrow">EXPLORE THE FIELD</p><h2>The leaderboard <span aria-hidden="true">↘</span></h2><p class="sub">Compare models across attention, usage, and upkeep.</p></div>' +
+    '<div class="leader-heading"><h2>Explore the models</h2><p class="sub">See how models compare and find one that fits your work.</p></div>' +
     '<details class="card score-settings"' + (scoreOpen ? ' open' : '') + '><summary>Adjust score and filters</summary><h2>Weight the score yourself</h2>' +
     '<div class="controls">' + sliders + "</div>" +
     '<div class="filters">' + chips.map(function (c) {
@@ -295,7 +296,7 @@ function renderModels() {
     '<p class="sub" style="margin-bottom:0">Citations measure attention, downloads measure use, and ' +
     'last-commit date measures upkeep. Models that rank high on one and low on another are the ' +
     'ones worth a second look.</p></details>' +
-    '<div class="card leaderboard-card"><div class="leader-toolbar"><label for="model-search" class="sr-only">Search models</label><input id="model-search" type="search" placeholder="Search models" value="' + esc(modelSearch) + '"><span>' + rows.length + ' models</span></div><p class="sub cell-legend">Cell size represents training data; exact values appear in the Cells column.</p><div class="table-scroll"><table><thead><tr>' +
+    '<div class="card leaderboard-card"><div class="leader-toolbar"><label for="model-search" class="sr-only">Search models</label><input id="model-search" type="search" placeholder="Search models" value="' + esc(modelSearch) + '"><span>' + rows.length + ' models</span></div><p class="sub cell-legend">The circle shows the size of each model’s training dataset. The exact count is in the Cells column.</p><div class="table-scroll"><table><thead><tr>' +
     head.map(function (h) {
       return "<th" + (h[2] ? ' class="num' + (h[0] ? " sortable" : "") + '"' :
         (h[0] ? ' class="sortable"' : "")) +
@@ -745,7 +746,180 @@ function renderLandscape() {
       missing.map(function (m) { return esc(shortName(m.name)); }).join(", ") +
       " — because no GitHub repo or Hugging Face weights are registered for them. That is " +
       "missing data, not zero usage.</p>" : "") +
-    "</div>";
+    "</div>" + citationHistoryMarkup() + citationTimelineMarkup();
+  initCitationHistory();
+  initCitationTimeline();
+}
+
+function citationHistoryMarkup() {
+  return '<div class="card"><h2>Citation trends by model</h2>' +
+    '<p class="sub">Compare citations received each year or each model’s share of citations to tracked models. Select a model to highlight it. The latest year may be incomplete.</p>' +
+    '<div class="timeline-controls"><label for="history-metric">Measure</label><select id="history-metric"><option value="count">Annual citations</option><option value="share">Share of tracked citations</option></select>' +
+    '<label for="history-model">Highlight model</label><select id="history-model"><option value="">All models</option></select></div>' +
+    '<div class="timeline-chart-wrap"><svg id="history-chart" viewBox="0 0 960 430" role="img" aria-label="Annual citation trends by model"></svg></div>' +
+    '<p id="history-detail" class="timeline-detail" aria-live="polite">Select a model to highlight its trend. Hover over a point for its value.</p>' +
+    '<p class="sub">Shares use citations to models introduced by that year. A paper citing multiple models contributes to each model’s count. Future-dated records are excluded until their year.</p></div>';
+}
+
+function initCitationHistory() {
+  var models = DATA.models.filter(function (m) { return Number.isFinite(Number(m.year)) && m.counts_by_year; });
+  if (!models.length) { el("history-detail").textContent = "No annual citation data is available."; return; }
+  var first = Math.min.apply(null, models.map(function (m) { return Number(m.year); }));
+  var last = Math.max(first, Number(String(DATA.meta.updated || "").slice(0, 4)) || new Date().getFullYear());
+  var selector = el("history-model"), metric = el("history-metric"), chart = el("history-chart");
+  models.slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).forEach(function (m) {
+    var option = document.createElement("option"); option.value = m.id; option.textContent = m.name; selector.appendChild(option);
+  });
+  function count(m, year) { return Number(m.counts_by_year[year]) || 0; }
+  function total(year) { return models.reduce(function (sum, m) { return sum + (Number(m.year) <= year ? count(m, year) : 0); }, 0); }
+  function value(m, year) { var n = count(m, year), t = total(year); return metric.value === "share" ? (t ? 100 * n / t : null) : n; }
+  function draw() {
+    var chosen = selector.value, all = [];
+    models.forEach(function (m) { for (var year = Number(m.year); year <= last; year++) { var v = value(m, year); if (v != null) all.push(v); } });
+    var max = metric.value === "share" ? 100 : Math.max(1, Math.ceil(Math.max.apply(null, all.concat([0])) / 5 / 100) * 500);
+    var left = 90, right = 775, upper = 30, bottom = 350;
+    function x(year) { return left + (year - first) / Math.max(1, last - first) * (right - left); }
+    function y(v) { return bottom - v / max * (bottom - upper); }
+    var svg = '';
+    for (var i = 0; i <= 5; i++) { var tick = max * i / 5, yy = y(tick); svg += '<line x1="' + left + '" y1="' + yy + '" x2="' + right + '" y2="' + yy + '" class="timeline-grid"/><text x="' + (left - 10) + '" y="' + (yy + 4) + '" text-anchor="end" class="timeline-tick">' + (metric.value === "share" ? tick + '%' : num(tick)) + '</text>'; }
+    for (var yr = first; yr <= last; yr++) svg += '<text x="' + x(yr) + '" y="' + (bottom + 24) + '" text-anchor="middle" class="timeline-tick">' + yr + '</text>';
+    svg += '<text x="500" y="410" text-anchor="middle" class="timeline-axis">Year</text><text x="18" y="190" text-anchor="middle" transform="rotate(-90 18 190)" class="timeline-axis">' + (metric.value === "share" ? 'Share of tracked citations' : 'Citations per year') + '</text>';
+    models.slice().sort(function (a, b) { return (a.id === chosen ? 1 : 0) - (b.id === chosen ? 1 : 0); }).forEach(function (m) {
+      var segments = [], segment = [], points = '';
+      for (var year = Number(m.year); year <= last; year++) {
+        var v = value(m, year);
+        if (v == null) { if (segment.length) segments.push(segment); segment = []; continue; }
+        var px = x(year), py = y(v), label = m.name + ' · ' + year + ' · ' + (metric.value === "share" ? v.toFixed(1) + '%' : num(v) + ' citations');
+        segment.push(px + ',' + py);
+        points += '<circle class="history-point' + (chosen && chosen !== m.id ? ' muted' : '') + '" cx="' + px + '" cy="' + py + '" r="4"><title>' + esc(label) + '</title></circle>';
+      }
+      if (segment.length) segments.push(segment);
+      segments.forEach(function (s) { svg += '<polyline class="history-line' + (chosen && chosen !== m.id ? ' muted' : chosen === m.id ? ' selected' : '') + '" points="' + s.join(' ') + '" />'; });
+      svg += points;
+    });
+    // Place labels at the last year, separating nearby endpoints to keep names legible.
+    var leaders = models.filter(function (m) { return Number(m.year) <= last && value(m, last) != null; })
+      .sort(function (a, b) { return value(b, last) - value(a, last) || a.name.localeCompare(b.name); }).slice(0, 5)
+      .map(function (m) { return { model: m, endpoint: y(value(m, last)), labelY: y(value(m, last)) }; })
+      .sort(function (a, b) { return a.labelY - b.labelY; });
+    leaders.forEach(function (item, index) { item.labelY = Math.max(upper + 6, item.labelY, index ? leaders[index - 1].labelY + 17 : upper + 6); });
+    if (leaders.length && leaders[leaders.length - 1].labelY > bottom - 3) {
+      leaders[leaders.length - 1].labelY = bottom - 3;
+      for (var j = leaders.length - 2; j >= 0; j--) leaders[j].labelY = Math.min(leaders[j].labelY, leaders[j + 1].labelY - 17);
+    }
+    leaders.forEach(function (item) {
+      svg += '<line x1="' + (right + 5) + '" y1="' + item.endpoint + '" x2="' + (right + 13) + '" y2="' + item.labelY + '" class="history-label-line"/>' +
+        '<text x="' + (right + 17) + '" y="' + (item.labelY + 4) + '" class="history-label">' + esc(shortName(item.model.name)) + '</text>';
+    });
+    chart.innerHTML = svg;
+    var selected = models.filter(function (m) { return m.id === chosen; })[0];
+    var values = [];
+    if (selected) for (var selectedYear = Number(selected.year); selectedYear <= last; selectedYear++) {
+      var selectedValue = value(selected, selectedYear);
+      values.push(selectedYear + ': ' + (selectedValue == null ? 'unavailable' : metric.value === 'share' ? selectedValue.toFixed(1) + '%' : num(selectedValue)));
+    }
+    el("history-detail").textContent = selected ? selected.name + ' · ' + values.join('  ·  ') : 'Select a model to highlight its trend. Hover over a point for its value.';
+  }
+  selector.addEventListener("change", draw); metric.addEventListener("change", draw); draw();
+}
+
+/* Annual counts are publication-year buckets, not dated citation events. */
+function citationTimelineMarkup() {
+  return '<div class="card citation-timeline"><h2>Model citations by year</h2>' +
+    '<p class="sub">Each dot represents a model and appears in the year it was introduced. Its horizontal position shows the selected year, its height shows citations in that year, and its area shows its share of citations across the models shown that year. The latest year may be incomplete.</p>' +
+    '<div class="timeline-controls"><button type="button" id="timeline-play">Play</button>' +
+    '<label for="timeline-year">Year <b id="timeline-year-label"></b></label>' +
+    '<input type="range" id="timeline-year" step="1" aria-label="Citation year">' +
+    '<label for="timeline-model">Inspect model</label><select id="timeline-model"><option value="">Select a model</option></select></div>' +
+    '<div class="timeline-chart-wrap"><svg id="timeline-chart" viewBox="0 0 960 430" role="img" aria-label="Annual citations by year"></svg></div>' +
+    '<p id="timeline-detail" class="timeline-detail" aria-live="polite">Select a dot or a model to see its citation count.</p>' +
+    '<div id="timeline-models" class="timeline-models" aria-label="Models and annual citations"></div>' +
+    '<p class="sub">Shares are based on citations to the tracked models visible in that year. An article citing multiple models contributes to each model’s count. Only citing articles with a publication year are included; future-dated records are excluded until their year. Citation attention is not a direct measure of usage.</p></div>';
+}
+
+function stopCitationTimeline() {
+  if (citationTimelineTimer !== null) clearInterval(citationTimelineTimer);
+  citationTimelineTimer = null;
+  var button = el("timeline-play");
+  if (button) button.textContent = "Play";
+}
+
+function initCitationTimeline() {
+  stopCitationTimeline();
+  var models = DATA.models.filter(function (m) { return Number.isFinite(Number(m.year)) && m.counts_by_year; });
+  if (!models.length) { el("timeline-detail").textContent = "No annual citation data is available."; return; }
+  var first = Math.min.apply(null, models.map(function (m) { return Number(m.year); }));
+  var last = Math.max(first, Number(String(DATA.meta.updated || "").slice(0, 4)) || new Date().getFullYear());
+  var range = el("timeline-year"), selector = el("timeline-model"), chart = el("timeline-chart");
+  range.min = first; range.max = last; range.value = first;
+  models.slice().sort(function (a, b) { return a.name.localeCompare(b.name); }).forEach(function (m) {
+    var option = document.createElement("option"); option.value = m.id; option.textContent = m.name; selector.appendChild(option);
+  });
+  function annual(m, year) { return Number((m.counts_by_year || {})[year]) || 0; }
+  var ceiling = Math.max(1, Math.max.apply(null, models.map(function (m) {
+    return Math.max.apply(null, Object.keys(m.counts_by_year).filter(function (year) {
+      return Number(year) <= last;
+    }).map(function (year) { return annual(m, year); }).concat([0]));
+  })));
+  var top = Math.ceil(ceiling / 5 / 100) * 100 * 5 || 5;
+  var left = 90, right = 900, upper = 35, bottom = 350;
+  function x(year) { return left + (year - first) / Math.max(1, last - first) * (right - left); }
+  function y(count) { return bottom - count / top * (bottom - upper); }
+  var base = '';
+  for (var i = 0; i <= 5; i++) {
+    var count = top * i / 5, yy = y(count);
+    base += '<line x1="' + left + '" y1="' + yy + '" x2="' + right + '" y2="' + yy + '" class="timeline-grid"/><text x="' + (left - 10) + '" y="' + (yy + 4) + '" text-anchor="end" class="timeline-tick">' + num(count) + '</text>';
+  }
+  for (var yr = first; yr <= last; yr++) base += '<line x1="' + x(yr) + '" y1="' + upper + '" x2="' + x(yr) + '" y2="' + bottom + '" class="timeline-grid"/><text x="' + x(yr) + '" y="' + (bottom + 24) + '" text-anchor="middle" class="timeline-tick">' + yr + '</text>';
+  base += '<text x="500" y="410" text-anchor="middle" class="timeline-axis">Year</text>' +
+    '<text x="17" y="195" text-anchor="middle" transform="rotate(-90 17 195)" class="timeline-axis">Citations in selected year</text><g id="timeline-dots"></g>';
+  chart.innerHTML = base;
+  var dots = el("timeline-dots");
+  models.forEach(function (m) {
+    var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    circle.setAttribute("cx", x(first)); circle.setAttribute("r", "7");
+    circle.setAttribute("class", "timeline-dot"); circle.setAttribute("data-id", m.id);
+    circle.addEventListener("click", function () { selector.value = m.id; update(); });
+    var title = document.createElementNS("http://www.w3.org/2000/svg", "title"); circle.appendChild(title);
+    dots.appendChild(circle);
+  });
+  function update() {
+    var year = Number(range.value), chosen = selector.value;
+    var total = models.reduce(function (sum, m) { return sum + (Number(m.year) <= year ? annual(m, year) : 0); }, 0);
+    function shareText(value) { return total ? (100 * value / total).toFixed(1) + "% of tracked citations" : "share unavailable (no citations)"; }
+    el("timeline-year-label").textContent = year;
+    Array.prototype.forEach.call(dots.children, function (circle) {
+      var m = models.filter(function (item) { return item.id === circle.getAttribute("data-id"); })[0];
+      var value = annual(m, year), visible = Number(m.year) <= year;
+      circle.setAttribute("cx", x(year)); circle.setAttribute("cy", y(value)); circle.style.display = visible ? "" : "none";
+      // Circle area, rather than radius, is proportional to the annual share.
+      // A small marker keeps zero-citation models visible.
+      circle.setAttribute("r", value && total ? 24 * Math.sqrt(value / total) : 3);
+      circle.classList.toggle("selected", m.id === chosen);
+      circle.firstChild.textContent = m.name + " · introduced " + m.year + " · " + num(value) + " citations in " + year + " · " + shareText(value);
+    });
+    var selected = models.filter(function (m) { return m.id === chosen; })[0];
+    el("timeline-detail").textContent = selected ? (Number(selected.year) > year ? selected.name + " had not yet been introduced in " + year + "." : selected.name + " · introduced " + selected.year + " · " + num(annual(selected, year)) + " citations in " + year + " · " + shareText(annual(selected, year))) : "Select a dot or a model to see its citation count and share.";
+    el("timeline-models").innerHTML = models.filter(function (m) { return Number(m.year) <= year; })
+      .sort(function (a, b) { return annual(b, year) - annual(a, year) || a.name.localeCompare(b.name); })
+      .map(function (m) { return '<button type="button" class="timeline-model' + (m.id === chosen ? ' selected' : '') + '" data-timeline-model="' + esc(m.id) + '"><span>' + esc(m.name) + '</span><b>' + num(annual(m, year)) + ' <small>' + (total ? (100 * annual(m, year) / total).toFixed(1) + '%' : '—') + '</small></b></button>'; }).join("");
+  }
+  range.addEventListener("input", function () { stopCitationTimeline(); update(); });
+  selector.addEventListener("change", update);
+  el("timeline-models").addEventListener("click", function (event) {
+    var button = event.target.closest("[data-timeline-model]");
+    if (button) { selector.value = button.dataset.timelineModel; update(); selector.focus(); }
+  });
+  el("timeline-play").addEventListener("click", function () {
+    if (citationTimelineTimer !== null) { stopCitationTimeline(); return; }
+    if (Number(range.value) >= last) range.value = first;
+    update(); this.textContent = "Pause";
+    citationTimelineTimer = setInterval(function () {
+      range.value = Number(range.value) + 1; update();
+      if (Number(range.value) >= last) stopCitationTimeline();
+    }, 1100);
+  });
+  update();
 }
 
 function statusVar(upkeep) {
@@ -1100,6 +1274,7 @@ function renderAbout() {
 
 /* ---------- routing ---------- */
 function show(view, arg) {
+  if (view !== "landscape") stopCitationTimeline();
   ["models", "landscape", "matrix", "h2h", "citations", "about", "detail"].forEach(function (v) {
     el("view-" + v).hidden = v !== view;
   });
