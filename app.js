@@ -28,6 +28,7 @@ var weights = {attention: 0.35, momentum: 0.25, usage: 0.20, openness: 0.10,
                runnable: 0.10};
 var sortKey = "score", sortDir = -1;
 var filters = {};
+var modelSearch = "", scoreOpen = false;
 var TASKS = ["annotation", "integration", "imputation", "perturbation", "grn", "spatial"];
 var h2hPair = null;   // "modelA|modelB" while a matrix cell is selected
 var logWeeks = 1;     // changelog weeks shown on the leaderboard card
@@ -173,6 +174,7 @@ function renderKpis() {
 /* ---------- leaderboard ---------- */
 function activeModels() {
   return DATA.models.filter(function (mo) {
+    if (modelSearch && (mo.name + " " + mo.org).toLowerCase().indexOf(modelSearch.toLowerCase()) < 0) return false;
     if (filters.open && !mo.weights_open) return false;
     if (filters.active && mo.upkeep !== "active") return false;
     if (filters.surging && mo.velocity !== "surging") return false;
@@ -283,8 +285,8 @@ function renderModels() {
   ];
 
   el("view-models").innerHTML =
-    changelogCard() +
-    '<div class="card"><h2>Weight the score yourself</h2>' +
+    '<div class="leader-heading"><p class="eyebrow">EXPLORE THE FIELD</p><h2>The leaderboard <span aria-hidden="true">↘</span></h2><p class="sub">Compare models across attention, usage, and upkeep.</p></div>' +
+    '<details class="card score-settings"' + (scoreOpen ? ' open' : '') + '><summary>Adjust score and filters</summary><h2>Weight the score yourself</h2>' +
     '<div class="controls">' + sliders + "</div>" +
     '<div class="filters">' + chips.map(function (c) {
       return '<button class="chip' + (filters[c[0]] ? " on" : "") +
@@ -292,8 +294,8 @@ function renderModels() {
     }).join("") + "</div>" +
     '<p class="sub" style="margin-bottom:0">Citations measure attention, downloads measure use, and ' +
     'last-commit date measures upkeep. Models that rank high on one and low on another are the ' +
-    'ones worth a second look.</p></div>' +
-    '<div class="card"><div class="table-scroll"><table><thead><tr>' +
+    'ones worth a second look.</p></details>' +
+    '<div class="card leaderboard-card"><div class="leader-toolbar"><label for="model-search" class="sr-only">Search models</label><input id="model-search" type="search" placeholder="Search models" value="' + esc(modelSearch) + '"><span>' + rows.length + ' models</span></div><p class="sub cell-legend">Cell size represents training data; exact values appear in the Cells column.</p><div class="table-scroll"><table><thead><tr>' +
     head.map(function (h) {
       return "<th" + (h[2] ? ' class="num' + (h[0] ? " sortable" : "") + '"' :
         (h[0] ? ' class="sortable"' : "")) +
@@ -319,7 +321,7 @@ function renderModels() {
         "</td>" +
         '<td class="num">' + runnableCell(mo) + "</td>" +
         '<td class="num">' + compact(mo.params) + "</td>" +
-        '<td class="num">' + compact(mo.cells) + "</td>" +
+        '<td class="num"><span class="cell-size">' + (mo.cells != null ? '<i aria-hidden="true" style="width:' + (9 + 18 * Math.sqrt(mo.cells / (Math.max.apply(null, DATA.models.map(function (m) { return m.cells || 0; })) || 1))).toFixed(1) + 'px;height:' + (9 + 18 * Math.sqrt(mo.cells / (Math.max.apply(null, DATA.models.map(function (m) { return m.cells || 0; })) || 1))).toFixed(1) + 'px"></i>' : '') + compact(mo.cells) + '</span></td>' +
         '<td><div class="tasks">' + mo.tasks.map(function (t) {
           return '<span class="task-dot">' + t + "</span>";
         }).join("") + "</div></td>" +
@@ -327,8 +329,10 @@ function renderModels() {
         "</tr>";
     }).join("") + "</tbody></table></div>" +
     '<p class="sub">' + rows.length + " of " + DATA.models.length +
-    " models shown. Click a model name for its detail page.</p></div>";
+    " models shown. Click a model name for its detail page.</p></div>" + changelogCard();
 
+  var settings = el("view-models").querySelector(".score-settings");
+  settings.addEventListener("toggle", function () { scoreOpen = settings.open; });
   bindChangelogButtons();
 }
 
@@ -1145,6 +1149,14 @@ document.addEventListener("click", function (e) {
 });
 
 document.addEventListener("input", function (e) {
+  if (e.target.id === "model-search") {
+    modelSearch = e.target.value;
+    var cursor = e.target.selectionStart;
+    renderModels();
+    var search = el("model-search");
+    search.focus(); search.setSelectionRange(cursor, cursor);
+    return;
+  }
   if (!e.target.dataset.w) return;
   weights[e.target.dataset.w] = Number(e.target.value) / 100;
   var focused = e.target.dataset.w, pos = e.target.value;
