@@ -350,7 +350,8 @@ tbody tr:hover { background: var(--wash); }
 :root[data-theme="dark"] { --field-accent: #8ac8d2; --field-wash: #263d42; }
 .site-header { padding: 22px 0 16px; }
 .brand { font-size: 20px; font-weight: 600; letter-spacing: -.04em; border-bottom: 1px solid var(--border); padding-bottom: 14px; }
-.brand span { color: var(--field-accent); font-size: 25px; margin-right: 5px; }
+.brand-cell { display: inline-block; position: relative; width: 26px; height: 26px; vertical-align: -7px; margin-right: 7px; border: 1.5px solid var(--field-accent); border-radius: 45% 55% 54% 46%; background: var(--field-wash); }
+.brand-cell::after { content: ""; position: absolute; width: 8px; height: 8px; top: 7px; left: 8px; border-radius: 50%; background: var(--field-accent); opacity: .65; }
 .brand strong { font-weight: 400; }
 .site-header h1 { font-size: 15px; font-weight: 500; margin: 18px 0 4px; }
 .header-field { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
